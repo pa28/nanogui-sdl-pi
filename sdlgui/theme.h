@@ -43,7 +43,7 @@ void SDL_RenderCopy(SDL_Renderer* renderer, Texture& tex, const Vector2i& pos);
 class  Theme : public Object 
 {
 public:
-    explicit Theme([[maybe_unused]] SDL_Renderer *ctx = nullptr);
+    explicit Theme(SDL_Renderer *ctx = nullptr);
 
     /* Spacing-related parameters */
     int mStandardFontSize;
