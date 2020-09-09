@@ -88,13 +88,14 @@ NAMESPACE_BEGIN(sdlgui)
 
     TTF_Font *getFont(const Theme &theme, const std::string &fontname, size_t ptsize) {
 
+        // Compose a font name including the size as a key for caching
         std::string fullFontName = fontname;
         fullFontName += "_";
         fullFontName += std::to_string(ptsize);
 
-        TTF_Font *font;
         auto fontIt = internal::fonts.find(fullFontName);
         if (fontIt == internal::fonts.end()) {
+            // Compose a full pathname to the requested font and try to open it.
             std::string tmpFontname = theme.mFontPath;
             tmpFontname += "/";
             tmpFontname += fontname;
@@ -103,8 +104,9 @@ NAMESPACE_BEGIN(sdlgui)
             auto *fileFont = TTF_OpenFont(tmpFontname.c_str(), ptsize);
             if (fileFont != nullptr) {
                 internal::fonts[fullFontName] = fileFont;
-                font = fileFont;
+                return fileFont;
             } else {
+                // Use one of the "built in" fonts.
                 SDL_RWops *rw;
                 if (fontname == "sans")
                     rw = SDL_RWFromMem(roboto_regular_ttf, roboto_regular_ttf_size);
@@ -117,13 +119,11 @@ NAMESPACE_BEGIN(sdlgui)
 
                 TTF_Font *newFont = TTF_OpenFontRW(rw, false, ptsize);
                 internal::fonts[fullFontName] = newFont;
-                font = newFont;
+                return newFont;
             }
         } else {
-            font = fontIt->second;
+            return fontIt->second;
         }
-
-        return font;
     }
 
     int Theme::getTextBounds(const char *fontname, size_t ptsize, const char *text, int *w, int *h) const {
