@@ -105,7 +105,7 @@ public:
                            .checkbox("Another check box");
         }
 
-        ListImages images = loadImageDirectory(SDL_GetRenderer(pwindow), "icons");
+        ListImages images = loadImageDirectory(SDL_GetRenderer(pwindow), "icons", 0);
 
         {
           auto& pwindow = window("Basic widgets", Vector2i{ 200, 15 }).withLayout<GroupLayout>();
@@ -130,9 +130,8 @@ public:
           mCurrentImage = 0;
           for (auto& icon : images) mImagesData.emplace_back(icon.tex);
 
-          auto& img_window = window("Selected image", Vector2i(675, 15));
-          img_window.withLayout<GroupLayout>();
-          
+          auto& img_window = window("Selected image", Vector2i(100, 0));
+
           auto imageView = img_window.add<ImageView>(mImagesData[0]);
 
           imagePanelBtn.popup(Vector2i(245, 150))
@@ -371,7 +370,7 @@ public:
               }
           });
         }
-        performLayout(mSDL_Renderer);
+        performLayout(mRenderer);
     }
 
     ~TestWindow() {
@@ -440,6 +439,34 @@ private:
 };
 
 
+std::ostream &printEvent( std::ostream &os, const SDL_Event &e) {
+    if (e.type == SDL_MOUSEBUTTONDOWN ||
+        e.type == SDL_MOUSEBUTTONUP) {
+	    os << "type:     " << e.type << '\n'
+               << "windowID: " << e.button.windowID << '\n'
+	       << "which:    " << e.button.which << '\n'
+	       << "button:   " << (Uint32)e.button.button << '\n'
+	       << "state:    " << (Uint32)e.button.state << '\n'
+	       << "clicks:   " << (Uint32)e.button.clicks << '\n'
+	       << "x:        " << e.button.x << '\n'
+	       << "y:        " << e.button.y << '\n'
+	       << std::endl;
+    } else if ( e.type == SDL_FINGERMOTION ||
+        e.type == SDL_FINGERDOWN ||
+        e.type == SDL_FINGERUP ) {
+	    os << "type:     " << e.type << '\n'
+	       << "touchId:  " << e.tfinger.touchId << '\n'
+	       << "fingerId: " << e.tfinger.fingerId << '\n'
+	       << "x:        " << e.tfinger.x << '\n'
+	       << "y:        " << e.tfinger.y << '\n'
+	       << "dx:       " << e.tfinger.dx << '\n'
+	       << "dy:       " << e.tfinger.dy << '\n'
+	       << std::endl;
+    }
+
+    return os;
+}
+
 int main(int /* argc */, char ** /* argv */)
 {
     char rendername[256] = {0};
@@ -457,8 +484,8 @@ int main(int /* argc */, char ** /* argv */)
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    int winWidth = 1024;
-    int winHeight = 768;
+    int winWidth = 800;
+    int winHeight = 480;
 
     // Create an application window with the following settings:
     window = SDL_CreateWindow(
@@ -507,7 +534,32 @@ int main(int /* argc */, char ** /* argv */)
                 {
                     quit = true;
                 }
-                screen->onEvent( e );
+
+
+                if ( e.type == SDL_FINGERDOWN || e.type == SDL_FINGERUP ) {
+		    //printEvent( std::cout, e );
+		    //std::cout << "SDL_FINGERDOWN: " << e.type << std::endl;
+		    screen->onEvent( e );
+		    SDL_Event mbe;
+
+		    mbe.type = ( e.type == SDL_FINGERDOWN ) ? SDL_MOUSEBUTTONDOWN : SDL_MOUSEBUTTONUP;
+		    mbe.button.timestamp = e.tfinger.timestamp;
+		    mbe.button.windowID = SDL_GetWindowID(window);
+		    mbe.button.which = SDL_TOUCH_MOUSEID;
+		    mbe.button.button = SDL_BUTTON_LEFT;
+		    mbe.button.state = ( e.type == SDL_FINGERDOWN ) ? SDL_PRESSED : SDL_RELEASED;
+		    mbe.button.clicks = 1;
+		    mbe.button.x = (Sint32)(e.tfinger.x * winWidth);
+		    mbe.button.y = (Sint32)(e.tfinger.y * winHeight);
+		    SDL_WarpMouseGlobal(mbe.button.x, mbe.button.y);
+		    //std::cout << "Replaced with: SDL_MOUSEBUTTONDOWN: " << e.type << ' ' << winWidth << 'x' << winHeight <<std::endl;
+		    //printEvent( std::cout, mbe );
+		    SDL_PushEvent( &mbe );
+		} else if ( e.type == SDL_FINGERMOTION ) {
+		    //printEvent( std::cout, e );
+		    SDL_WarpMouseGlobal((Sint32)(e.tfinger.x * winWidth), (Sint32)(e.tfinger.y * winHeight));
+		} else
+                    screen->onEvent( e );
             }
             
             SDL_SetRenderDrawColor(renderer, 0xd3, 0xd3, 0xd3, 0xff );

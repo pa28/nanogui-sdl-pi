@@ -27,7 +27,7 @@ class  ImageView : public Widget
 {
 public:
     ImageView(Widget* parent, SDL_Texture *texture);
-    ~ImageView();
+    ~ImageView() override;
 
     void bindImage(SDL_Texture* texture);
 

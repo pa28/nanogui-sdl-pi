@@ -14,6 +14,7 @@
 #define __SDLGUI_SCREEN_H__
 
 #include <sdlgui/window.h>
+#include <sdlgui/frameless.h>
 
 union SDL_Event;
 struct SDL_Window;
@@ -83,12 +84,13 @@ public:
     SDL_Window *window() { return _window; }
 
     /// Return a pointer to the underlying nanoVG draw context
-    SDL_Renderer *sdlRenderer() { return mSDL_Renderer; }
+    SDL_Renderer *sdlRenderer() { return mRenderer; }
 
     /// Compute the layout of all widgets
     void performLayout();
 
     template<typename... Args>Window& window(const Args&... args) { return wdg<Window>(args...); }
+    template<typename... Args>FramelessWindow& framelessWindow(const Args&... args) { return wdg<FramelessWindow>(args...); }
 public:
     /// Initialize the \ref Screen
     void initialize(SDL_Window *window);
@@ -105,16 +107,17 @@ public:
     /* Internal helper functions */
     void updateFocus(Widget *widget);
     void disposeWindow(Window *window);
+    void disposeFramelessWindow(FramelessWindow *window);
     void centerWindow(Window *window);
     void moveWindowToFront(Window *window);
     void drawWidgets();
 
-    void performLayout(SDL_Renderer *renderer);
+    void performLayout(SDL_Renderer *renderer) override;
 
 protected:
     SDL_Window *_window;
     std::vector<Widget *> mFocusPath;
-    SDL_Renderer* mSDL_Renderer;
+    SDL_Renderer* mRenderer;
     Vector2i mFBSize;
     float mPixelRatio;
     int mMouseState, mModifiers;

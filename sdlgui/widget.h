@@ -315,9 +315,8 @@ public:
     template<typename... Args>TextBox& textbox(const Args&... args) { return wdg<TextBox>(args...); }
 
 
-protected:
-    /// Free all resources used by the widget and any children
-    virtual ~Widget();
+/// Free all resources used by the widget and any children
+virtual ~Widget();
 
 protected:
     Widget *mParent;

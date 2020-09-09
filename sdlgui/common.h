@@ -68,7 +68,7 @@ struct ImageInfo
 typedef std::vector<ImageInfo> ListImages;
 
 /// Load a directory of PNG images and upload them to the GPU (suitable for use with ImagePanel)
-ListImages loadImageDirectory(SDL_Renderer* renderer, const std::string &path);
+    ListImages loadImageDirectory(SDL_Renderer *renderer, const std::string &path, const int limit = 0);
 
 /**
 * \class Object object.h sdlgui/object.h

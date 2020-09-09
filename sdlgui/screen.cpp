@@ -29,7 +29,7 @@ std::map<SDL_Window *, Screen *> __sdlgui_screens;
 
 Screen::Screen( SDL_Window* window, const Vector2i &size, const std::string &caption,
                bool resizable, bool fullscreen)
-    : Widget(nullptr), _window(nullptr), mSDL_Renderer(nullptr), mCaption(caption)
+    : Widget(nullptr), _window(nullptr), mRenderer(nullptr), mCaption(caption)
 {
     SDL_SetWindowTitle( window, caption.c_str() );
     initialize( window );
@@ -97,13 +97,13 @@ void Screen::initialize(SDL_Window* window)
     _window = window;    
     SDL_GetWindowSize( window, &mSize[0], &mSize[1]);
     SDL_GetWindowSize( window, &mFBSize[0], &mFBSize[1]);
-    mSDL_Renderer = SDL_GetRenderer(window);
+    mRenderer = SDL_GetRenderer(window);
     
-    if (mSDL_Renderer == nullptr)
+    if (mRenderer == nullptr)
         throw std::runtime_error("Could not initialize NanoVG!");
 
     mVisible = true;
-    mTheme = new Theme(mSDL_Renderer);
+    mTheme = new Theme(mRenderer);
     mMousePos = { 0, 0 };
     mMouseState = mModifiers = 0;
     mDragActive = false;
@@ -417,12 +417,20 @@ void Screen::disposeWindow(Window *window) {
     removeChild(window);
 }
 
-void Screen::centerWindow(Window *window) 
+void Screen::disposeFramelessWindow(FramelessWindow *window) {
+    if (std::find(mFocusPath.begin(), mFocusPath.end(), window) != mFocusPath.end())
+        mFocusPath.clear();
+    if (mDragWidget == window)
+        mDragWidget = nullptr;
+    removeChild(window);
+}
+
+void Screen::centerWindow(Window *window)
 {
   if (window->size() == Vector2i{0, 0}) 
   {
-     window->setSize(window->preferredSize(mSDL_Renderer));
-     window->performLayout(mSDL_Renderer);
+     window->setSize(window->preferredSize(mRenderer));
+     window->performLayout(mRenderer);
   }
   window->setPosition((mSize - window->size()) / 2);
 }
@@ -456,7 +464,7 @@ void Screen::performLayout(SDL_Renderer* ctx)
 
 void Screen::performLayout()
 {
-  Widget::performLayout(mSDL_Renderer);
+  Widget::performLayout(mRenderer);
 }
 
 NAMESPACE_END(sdlgui)

@@ -1,8 +1,8 @@
-cmake_minimum_required (VERSION 2.8.3)
+cmake_minimum_required (VERSION 3.10)
 
 project("sdlgui")
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -85,6 +85,8 @@ elseif(CMAKE_SYSTEM MATCHES "Linux")
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+                    ${CMAKE_ROOT}
+                    src
                     ${CMAKE_CURRENT_SOURCE_DIR}/include
                     ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -98,6 +100,7 @@ list(APPEND NNGUI_BASIC_SOURCE
      sdlgui/colorwheel.h
      sdlgui/combobox.h
      sdlgui/common.h
+     sdlgui/frameless.h
      sdlgui/graph.h
      sdlgui/imagepanel.h
      sdlgui/imageview.h
@@ -128,6 +131,7 @@ list(APPEND NNGUI_BASIC_SOURCE
      sdlgui/colorwheel.cpp
      sdlgui/combobox.cpp
      sdlgui/common.cpp
+     sdlgui/frameless.cpp
      sdlgui/graph.cpp
      sdlgui/imagepanel.cpp
      sdlgui/imageview.cpp
@@ -153,20 +157,44 @@ list(APPEND NNGUI_BASIC_SOURCE
      sdlgui/window.cpp
      sdlgui/nanovg.c
 )
+
+INCLUDE(src/CMakeLists.txt)
      
 option(NANOGUI_BUILD_EXAMPLE "Build example application" ON)
 if (NANOGUI_BUILD_EXAMPLE)
   # Build example application if desired
-  add_executable(example1 ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} example1.cpp )
-  set_target_properties(
-      example1 PROPERTIES
-      VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
-  target_link_libraries(example1 ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
+#  add_executable(example1 ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} example1.cpp )
+#  set_target_properties(
+#      example1 PROPERTIES
+#      VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
+#  target_link_libraries(example1 ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
+#
+#  # Copy icons for example application
+#  if (WIN32)
+#    file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/debug)
+#  else()
+#    file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+#  endif()
+
+  # Build example application if desired
+#  add_executable(hamutilities ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} hamutilities.cpp )
+#  set_target_properties(
+#       PROPERTIES
+#      VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
+#  target_link_libraries(hamutilities ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
 
   # Copy icons for example application
   if (WIN32) 
     file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/debug)
   else()
     file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    file(COPY resources/images DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
   endif()
 endif()
+
+add_executable(hamchrono ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} ${HAM_SOURCES} hamchrono.cpp)
+set_target_properties(
+        hamchrono PROPERTIES
+        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
+target_link_libraries(hamchrono ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
+

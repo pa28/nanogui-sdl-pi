@@ -42,22 +42,22 @@ bool VScrollPanel::mouseDragEvent(const Vector2i &, const Vector2i &rel,  int, i
     if (mChildren.empty())
         return false;
 
-    float scrollh = height() *
-        std::min(1.0f, height() / (float)mChildPreferredHeight);
+    float scrollh = (float)height() *
+        std::min(1.0f, (float)height() / (float)mChildPreferredHeight);
 
     mScroll = std::max((float) 0.0f, std::min((float) 1.0f,
-                 mScroll + rel.y / (float)(mSize.y - 8 - scrollh)));
+                 mScroll + rel.y / (float)((float)mSize.y - (float)mTheme->mScrollBarWidth - scrollh)));
     return true;
 }
 
 bool VScrollPanel::scrollEvent(const Vector2i &/* p */, const Vector2f &rel)
 {
     float scrollAmount = rel.y * (mSize.y / 20.0f);
-    float scrollh = height() *
-        std::min(1.0f, height() / (float)mChildPreferredHeight);
+    float scrollh = (float)height() *
+        std::min(1.0f, (float)height() / (float)mChildPreferredHeight);
 
     mScroll = std::max((float) 0.0f, std::min((float) 1.0f,
-            mScroll - scrollAmount / (float)(mSize.y - 8 - scrollh)));
+            mScroll - scrollAmount / (float)((float)mSize.y - (float)mTheme->mScrollBarWidth - scrollh)));
     return true;
 }
 
@@ -65,7 +65,7 @@ bool VScrollPanel::mouseButtonEvent(const Vector2i &p, int button, bool down, in
 {
     if (mChildren.empty())
         return false;
-    int shift = (int) (mScroll*(mChildPreferredHeight - mSize.y));
+    int shift = (int) (mScroll*(float)(mChildPreferredHeight - mSize.y));
     return mChildren[0]->mouseButtonEvent(p - _pos + Vector2i{ 0, shift }, button, down, modifiers);
 }
 
@@ -73,7 +73,7 @@ bool VScrollPanel::mouseMotionEvent(const Vector2i &p, const Vector2i &rel, int 
 {
     if (mChildren.empty())
         return false;
-    int shift = (int) (mScroll*(mChildPreferredHeight - mSize.y));
+    int shift = (int) (mScroll*(float)(mChildPreferredHeight - mSize.y));
     return mChildren[0]->mouseMotionEvent(p - _pos + Vector2i{ 0, shift }, rel, button, modifiers);
 }
 
@@ -84,7 +84,7 @@ void VScrollPanel::draw(SDL_Renderer *renderer)
 
     Widget *child = mChildren[0];
     mChildPreferredHeight = child->preferredSize(nullptr).y;
-    float scrollh = height() * std::min(1.0f, height() / (float) mChildPreferredHeight);
+    float scrollh = (float)height() * std::min(1.0f, (float)height() / (float) mChildPreferredHeight);
 
     SDL_Point ap = getAbsolutePos();
     SDL_Rect brect{ ap.x, ap.y, width(), height() };
@@ -96,7 +96,7 @@ void VScrollPanel::draw(SDL_Renderer *renderer)
     {
       const Vector2i savepos = child->position();
       Vector2i npos = savepos;
-      mDOffset = -mScroll*(mChildPreferredHeight - mSize.y);
+      mDOffset = (int)(-mScroll*(float)(mChildPreferredHeight - mSize.y));
       npos.y += mDOffset;
       child->setPosition(npos);
       child->draw(renderer);
@@ -104,13 +104,16 @@ void VScrollPanel::draw(SDL_Renderer *renderer)
     }
 
     SDL_Color sc = mTheme->mBorderDark.toSdlColor();
-    SDL_Rect srect{ ap.x + mSize.x - 12, ap.y + 4, 8, mSize.y - 8 };
+    SDL_Rect srect{ ap.x + mSize.x - 12, ap.y + 4, mTheme->mScrollBarWidth, mSize.y - mTheme->mScrollBarWidth };
 
     SDL_SetRenderDrawColor(renderer, sc.r, sc.g, sc.b, sc.a);
     SDL_RenderFillRect(renderer, &srect);
       
     SDL_Color ss = mTheme->mBorderLight.toSdlColor();
-    SDL_Rect drect{ ap.x + mSize.x - 12 + 1, ap.y + 4 + (mSize.y - 8 - scrollh) * mScroll + 1, 6, scrollh - 1 };
+    auto yScroll = (int)((mSize.y - (float)mTheme->mScrollBarWidth - scrollh) * mScroll);
+    auto scrollh_1 = (int)(scrollh - 1);
+    SDL_Rect drect{ ap.x + mSize.x - 12 + 1, ap.y + 4 + yScroll + 1,
+        mTheme->mScrollBarWidth - mTheme->mScrollBarGutter * 2, scrollh_1 };
 
     SDL_SetRenderDrawColor(renderer, ss.r, ss.g, ss.b, ss.a);
     SDL_RenderFillRect(renderer, &drect);

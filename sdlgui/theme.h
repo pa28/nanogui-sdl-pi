@@ -15,6 +15,7 @@
 
 #include <sdlgui/common.h>
 #include <mutex>
+#include <string_view>
 
 struct SDL_Renderer;
 struct SDL_Texture;
@@ -25,7 +26,7 @@ NAMESPACE_BEGIN(sdlgui)
 struct Texture
 {
   SDL_Texture* tex = nullptr;
-  SDL_Rect rrect;
+  SDL_Rect rrect{};
   bool dirty = false;
 
   inline int w() const { return rrect.w; }
@@ -42,7 +43,7 @@ void SDL_RenderCopy(SDL_Renderer* renderer, Texture& tex, const Vector2i& pos);
 class  Theme : public Object 
 {
 public:
-    Theme(SDL_Renderer *ctx);
+    explicit Theme(SDL_Renderer *ctx = nullptr);
 
     /* Spacing-related parameters */
     int mStandardFontSize;
@@ -59,6 +60,8 @@ public:
     int mTabControlWidth;
     int mTabButtonHorizontalPadding;
     int mTabButtonVerticalPadding;
+    int mScrollBarWidth;
+    int mScrollBarGutter;
 
     std::mutex loadMutex;
 
@@ -99,6 +102,8 @@ public:
     Color mWindowPopup;
     Color mWindowPopupTransparent;
 
+    std::string mFontPath;
+
     void getTexAndRect(SDL_Renderer *renderer, int x, int y, const char *text,
       const char* fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect, SDL_Color *textColor);
 
@@ -116,7 +121,7 @@ public:
     void getTexAndRectUtf8(SDL_Renderer *renderer, Texture& tx, int x, int y, const char *text,
                            const char* fontname, size_t ptsize, const Color& textColor);
 
-protected:
+//protected:
     virtual ~Theme() { };
 };
 
