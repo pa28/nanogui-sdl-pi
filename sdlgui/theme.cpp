@@ -31,6 +31,9 @@ NAMESPACE_BEGIN(sdlgui)
         mStandardFontSize = 16;
         mButtonFontSize = 20;
         mTextBoxFontSize = 20;
+        mTimeBoxHoursMinFontSize = 30;
+        mTimeBoxSecFontSize = 20;
+        mTimeBoxDateFontSize = 20;
         mWindowCornerRadius = 2;
         mWindowHeaderHeight = 30;
         mWindowDropShadowSize = 10;
@@ -81,7 +84,10 @@ NAMESPACE_BEGIN(sdlgui)
         mWindowPopup = Color(50, 255);
         mWindowPopupTransparent = Color(50, 0);
 
+        // Fonts
         mFontPath = "/usr/share/fonts/truetype/freefont";
+        mTimeBoxTimeFont = "FreeMonoBold";
+        mTimeBoxDateFont = "FreeSansBold";
 
         TTF_Init();
     }

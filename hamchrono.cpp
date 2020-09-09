@@ -38,11 +38,11 @@ public:
         mTimeDisplay->withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Minimum, 0, 5);
         mDateDisplay = this->add<Widget>();
         mDateDisplay->withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Maximum, 0, 5);
-        mHoursMins = mTimeDisplay->add<Label>("", "FreeMonoBold");
-        mHoursMins->setFontSize(30);
-        mSeconds = mTimeDisplay->add<Label>("", "FreeMonoBold");
-        mSeconds->setFontSize(20);
-        mDate = mDateDisplay->add<Label>("", "FreeSansBold");
+        mHoursMins = mTimeDisplay->add<Label>("", mTheme->mTimeBoxTimeFont);
+        mHoursMins->setFontSize(mTheme->mTimeBoxHoursMinFontSize);
+        mSeconds = mTimeDisplay->add<Label>("", mTheme->mTimeBoxTimeFont);
+        mSeconds->setFontSize(mTheme->mTimeBoxSecFontSize);
+        mDate = mDateDisplay->add<Label>("", mTheme->mTimeBoxDateFont);
 
         mEpoch = std::chrono::system_clock::now();
         renderTime(mEpoch);
