@@ -86,8 +86,15 @@ NAMESPACE_BEGIN(sdlgui)
         TTF_Init();
     }
 
+    /**
+     * getFont -- Attempt to find the requested font in the file system or built-in. Return
+     * the found font or a fallback if none is found.
+     * @param theme Theme data for the user font path.
+     * @param fontname The user supplied font name.
+     * @param ptsize The user supplied point size.
+     * @return a TrueType font, possibly a built in as fallback.
+     */
     TTF_Font *getFont(const Theme &theme, const std::string &fontname, size_t ptsize) {
-
         // Compose a font name including the size as a key for caching
         std::string fullFontName = fontname;
         fullFontName += "_";
