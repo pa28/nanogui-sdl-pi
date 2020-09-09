@@ -105,18 +105,18 @@ public:
     std::string mFontPath;
 
     void getTexAndRect(SDL_Renderer *renderer, int x, int y, const char *text,
-      const char* fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect, SDL_Color *textColor);
+      const char* fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect, SDL_Color *textColor) const;
 
     void getTexAndRectUtf8(SDL_Renderer *renderer, int x, int y, const char *text,
-      const char* fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect, SDL_Color *textColor);
+      const char* fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect, SDL_Color *textColor) const;
 
     std::string breakText(SDL_Renderer* renderer, const char* string, const char* fontname, int ptsize,
                        float breakRowWidth);
 
-    int getTextWidth(const char* fontname, size_t ptsize, const char* text);
-    int getUtf8Width(const char* fontname, size_t ptsize, const char* text);
-    int getTextBounds(const char* fontname, size_t ptsize, const char* text, int *w, int *h);
-    int getUtf8Bounds(const char* fontname, size_t ptsize, const char* text, int *w, int *h);
+    int getTextWidth(const char* fontname, size_t ptsize, const char* text) const;
+    int getUtf8Width(const char* fontname, size_t ptsize, const char* text) const;
+    int getTextBounds(const char* fontname, size_t ptsize, const char* text, int *w, int *h) const;
+    int getUtf8Bounds(const char* fontname, size_t ptsize, const char* text, int *w, int *h) const;
 
     void getTexAndRectUtf8(SDL_Renderer *renderer, Texture& tx, int x, int y, const char *text,
                            const char* fontname, size_t ptsize, const Color& textColor);
