@@ -76,7 +76,7 @@ void BoxLayout::performLayout(SDL_Renderer *ctx, Widget *widget) const
     int _position = mMargin;
     int yOffset = 0;
 
-    const Window *window = dynamic_cast<const Window *>(widget);
+    const auto *window = dynamic_cast<const Window *>(widget);
     if (window && !window->title().empty()) 
     {
         if (mOrientation == Orientation::Vertical) 
