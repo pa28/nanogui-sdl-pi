@@ -1,19 +1,35 @@
-# NanoGUI-SDL [![Build Status](https://travis-ci.org/dalerank/nanogui-sdl.svg?branch=master)](https://travis-ci.org/dalerank/nanogui-sdl)
+# NanoGUI-SDL-Pi
 
-NanoGUI-SDL is a SDL port for https://github.com/wjakob/nanogui
+NanoGUI-SDL-Pi is a RaspberryPi port/rewirte for [NanoGUI-SDL](https://github.com/dalerank/nanogui-sdl)
+ which is an SDL port for [NanoGUI](https://github.com/wjakob/nanogui)
 
 ## Example screenshot
 ![Screenshot](https://github.com/dalerank/nanogui-sdl/blob/master/resources/screenshot1.png "Screenshot")
 
 ## Description
-NanoGUI-SDL builds on [SDL2](http://www.libsdl.org/) for cross-platform context
-creation and event handling, for
-basic vector types, and [NanoVG/NanoVG-RT](https://github.com/memononen/NanoVG) to draw
-2D primitives.
+NanoGUI-SDL-Pi builds on [SDL2](http://www.libsdl.org/) for cross-platform context
+creation and event handling, for basic vector types, and
+[NanoVG/NanoVG-RT](https://github.com/memononen/NanoVG) to draw2D primitives.
 
-NanoGUI-SDL currently works on Mac OS X (Clang) Linux (GCC or Clang) and Windows
-(Visual Studio ≥ 2015, Gcc ≥ 4.8); it requires a recent C++11 capable compiler. All
-dependencies are jointly built using a CMake-based build system.
+NanoGUI-SDL-Pi is intended to work on the latest version of
+[RaspberryPi OS](https://www.raspberrypi.org/downloads/raspberry-pi-os/)
+, but is developed on Linux (specifically Linux Mint) so it should compile and run
+on any Linux variant that supports C++17 and the SDL2 library set.
+
+### Reasoning
+
+I initially started with a fork of NanoGUI-SDL on github, but I found there were too many changes I wanted
+to make:
+    
+* Support touch screen actions on Raspberry Pi 7 inch touch display;
+* Write "kiosk" type applications that take over the screen and run without X11, a screen manager or
+    similar;
+* Add the ability to use installed font files;
+* Fix as many compiler wanings as I can; and
+* Upgrade to C++17 or even C++20 over time.
+
+When ready this repository will be nested into my [HamChrono](git@github.com:pa28/HamChrono.git)
+repository to provide frame buffer support. 
 
 ## Creating widgets
 NanoGUI-SDL makes it easy to instantiate widgets, set layout constraints, and
@@ -95,32 +111,6 @@ screen->performLayout();
 window->center();
 ```
 
-## Compiling on windows (MSVC/git bash)
-```bash
-$ git clone https://github.com/dalerank/nanogui-sdl
-$ cd nanogui-sdl
-$ export CURSRC=`pwd`
-# this part if you have not installed sdl2 libraries
-$ curl https://www.libsdl.org/release/SDL2-2.0.10-win32-x86.zip --output sdl2.zip
-$ 7z e sdl2.zip -obuild/debug -y -r -spf
-$ curl https://www.libsdl.org/release/SDL2-devel-2.0.10-VC.zip --output sdl2-devel.zip
-$ 7z e sdl2-devel.zip -y -r -spf
-$ curl https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.5-win32-x86.zip --output sdl2img.zip
-$ 7z e sdl2img.zip -obuild/debug -y -r -spf
-$ curl https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.5-VC.zip --output sdl2img-devel.zip
-$ 7z e sdl2img-devel.zip -y -r -spf
-$ curl https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-2.0.15-win32-x86.zip --output sdl2ttf.zip
-$ 7z e sdl2ttf.zip -obuild/debug -y -r -spf
-$ curl https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-devel-2.0.15-VC.zip --output sdl2ttf-devel.zip
-$ 7z e sdl2ttf-devel.zip -y -r -spf        
-# now build example
-$ mkdir -p build
-$ cd build
-$ cmake --version 
-# here setup default path to libraries you may change it for real sdl2 files placed
-$ cmake -DSDL2_LIBRARY="$CURSRC/SDL2-2.0.10/lib/x86/sdl2.lib" -DSDL2_INCLUDE_DIR="$CURSRC/sdl2-2.0.10/include" -   DSDL2TTF_LIBRARY="$CURSRC/SDL2_ttf-2.0.15/lib/x86/sdl2_ttf.lib" -DSDL2TTF_INCLUDE_DIR="$CURSRC/SDL2_ttf-2.0.15/include" -DSDL2_IMAGE_LIBRARY="$CURSRC/SDL2_image-2.0.5/lib/x86/sdl2_image.lib" -DSDL2_IMAGE_INCLUDE_DIR="$CURSRC/SDL2_image-2.0.5/include" ..
-$ cmake --build .
-```
 
 ### start On Linux (Ubuntu)
 ```
@@ -130,13 +120,14 @@ $ sudo apt install build-essential cmake libsdl2-dev libsdl2-image-dev libsdl2-t
 
 #setup and run example:
 
-$ git clone https://github.com/dalerank/nanogui-sdl
+$ git clone git@github.com:pa28/nanogui-sdl-pi.git
 $ cd nanogui-sdl
 $ mkdir -p build
 $ cd build/
 $ cmake ..
 $ cmake --build .
 $ ./example1
+$ ./hamcrono
 
 ```
 
