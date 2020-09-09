@@ -33,15 +33,22 @@ private:
 
 public:
     explicit TimeBox(Widget *parent) : Widget(parent) {
+        // Compute an offset which will (hopefully) line hours, mins and secs up by their tops
+        // TODO: Label widgets should set their size based on the font size used.
+        auto timeSizeDiff = std::abs(mTheme->mTimeBoxHoursMinFontSize - mTheme->mTimeBoxSecFontSize);
+
+        // Construct a time Box
         withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum, 0, 5);
         mTimeDisplay = this->add<Widget>();
         mTimeDisplay->withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Minimum, 0, 5);
         mDateDisplay = this->add<Widget>();
         mDateDisplay->withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Maximum, 0, 5);
         mHoursMins = mTimeDisplay->add<Label>("", mTheme->mTimeBoxTimeFont);
+        mHoursMins->setFixedHeight(mTheme->mTimeBoxHoursMinFontSize);
         mHoursMins->setFontSize(mTheme->mTimeBoxHoursMinFontSize);
         mSeconds = mTimeDisplay->add<Label>("", mTheme->mTimeBoxTimeFont);
         mSeconds->setFontSize(mTheme->mTimeBoxSecFontSize);
+        mSeconds->setFixedHeight(mTheme->mTimeBoxSecFontSize + timeSizeDiff/2);
         mDate = mDateDisplay->add<Label>("", mTheme->mTimeBoxDateFont);
 
         mEpoch = std::chrono::system_clock::now();
