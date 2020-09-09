@@ -86,7 +86,7 @@ NAMESPACE_BEGIN(sdlgui)
         TTF_Init();
     }
 
-    TTF_Font *getFont(const Theme &theme, const char *fontname, size_t ptsize) {
+    TTF_Font *getFont(const Theme &theme, const std::string &fontname, size_t ptsize) {
 
         std::string fullFontName = fontname;
         fullFontName += "_";
@@ -105,14 +105,15 @@ NAMESPACE_BEGIN(sdlgui)
                 internal::fonts[fullFontName] = fileFont;
                 font = fileFont;
             } else {
-                SDL_RWops *rw = nullptr;
-                tmpFontname = fontname;
-                if (tmpFontname == "sans")
+                SDL_RWops *rw;
+                if (fontname == "sans")
                     rw = SDL_RWFromMem(roboto_regular_ttf, roboto_regular_ttf_size);
-                else if (tmpFontname == "sans-bold")
+                else if (fontname == "sans-bold")
                     rw = SDL_RWFromMem(roboto_bold_ttf, roboto_bold_ttf_size);
-                else if (tmpFontname == "icons")
+                else if (fontname == "icons")
                     rw = SDL_RWFromMem(entypo_ttf, entypo_ttf_size);
+                else // Provide a fall back font
+                    rw = SDL_RWFromMem(roboto_regular_ttf, roboto_regular_ttf_size);
 
                 TTF_Font *newFont = TTF_OpenFontRW(rw, false, ptsize);
                 internal::fonts[fullFontName] = newFont;
