@@ -27,7 +27,7 @@ NAMESPACE_BEGIN(sdlgui)
         std::map<std::string, TTF_Font *> fonts;
     }
 
-    Theme::Theme(SDL_Renderer *ctx) {
+    Theme::Theme([[maybe_unused]] SDL_Renderer *ctx) {
         mStandardFontSize = 16;
         mButtonFontSize = 20;
         mTextBoxFontSize = 20;
@@ -92,7 +92,7 @@ NAMESPACE_BEGIN(sdlgui)
         fullFontName += "_";
         fullFontName += std::to_string(ptsize);
 
-        TTF_Font *font = nullptr;
+        TTF_Font *font;
         auto fontIt = internal::fonts.find(fullFontName);
         if (fontIt == internal::fonts.end()) {
             std::string tmpFontname = theme.mFontPath;
@@ -163,7 +163,7 @@ NAMESPACE_BEGIN(sdlgui)
     }
 
 
-    void Theme::getTexAndRect(SDL_Renderer *renderer, int x, int y, const char *text,
+    [[maybe_unused]] void Theme::getTexAndRect(SDL_Renderer *renderer, int x, int y, const char *text,
                               const char *fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect,
                               SDL_Color *textColor) const {
         int text_width;
@@ -236,12 +236,12 @@ NAMESPACE_BEGIN(sdlgui)
         rect->h = text_height;
     }
 
-    std::string Theme::breakText(SDL_Renderer *renderer, const char *string, const char *fontname, int ptsize,
-                                 float breakRowWidth) {
+    std::string Theme::breakText([[maybe_unused]] SDL_Renderer *renderer, const char *string, const char *fontname, int ptsize,
+                                 float breakRowWidth) const {
         std::string _string(string);
         for (int i = 0; i < _string.size(); i++) {
             int slen = getTextWidth(fontname, ptsize, _string.substr(0, i).c_str());
-            if (slen >= breakRowWidth)
+            if ((float)slen >= breakRowWidth)
                 return _string.substr(0, i);
         }
 
@@ -249,7 +249,7 @@ NAMESPACE_BEGIN(sdlgui)
     }
 
     void Theme::getTexAndRectUtf8(SDL_Renderer *renderer, Texture &tx, int x, int y, const char *text,
-                                  const char *fontname, size_t ptsize, const Color &textColor) {
+                                  const char *fontname, size_t ptsize, const Color &textColor) const {
         tx.dirty = false;
         SDL_Color tColor = textColor.toSdlColor();
         getTexAndRectUtf8(renderer, 0, 0, text, fontname, ptsize, &tx.tex, &tx.rrect, &tColor);
