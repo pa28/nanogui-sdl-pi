@@ -86,8 +86,7 @@ NAMESPACE_BEGIN(sdlgui)
         TTF_Init();
     }
 
-    TTF_Font *getFont(const char *fontname, size_t ptsize) {
-        Theme theme;    // ToDo: pass theme into this function.
+    TTF_Font *getFont(const Theme &theme, const char *fontname, size_t ptsize) {
 
         std::string fullFontName = fontname;
         fullFontName += "_";
@@ -126,8 +125,8 @@ NAMESPACE_BEGIN(sdlgui)
         return font;
     }
 
-    int Theme::getTextBounds(const char *fontname, size_t ptsize, const char *text, int *w, int *h) {
-        TTF_Font *font = getFont(fontname, ptsize);
+    int Theme::getTextBounds(const char *fontname, size_t ptsize, const char *text, int *w, int *h) const {
+        TTF_Font *font = getFont(*this, fontname, ptsize);
 
         if (!font)
             return -1;
@@ -136,8 +135,8 @@ NAMESPACE_BEGIN(sdlgui)
         return 0;
     }
 
-    int Theme::getUtf8Bounds(const char *fontname, size_t ptsize, const char *text, int *w, int *h) {
-        TTF_Font *font = getFont(fontname, ptsize);
+    int Theme::getUtf8Bounds(const char *fontname, size_t ptsize, const char *text, int *w, int *h) const {
+        TTF_Font *font = getFont(*this, fontname, ptsize);
 
         if (!font)
             return -1;
@@ -146,14 +145,14 @@ NAMESPACE_BEGIN(sdlgui)
         return 0;
     }
 
-    int Theme::getTextWidth(const char *fontname, size_t ptsize, const char *text) {
+    int Theme::getTextWidth(const char *fontname, size_t ptsize, const char *text) const {
         int w, h;
         getTextBounds(fontname, ptsize, text, &w, &h);
         return w;
     }
 
-    int Theme::getUtf8Width(const char *fontname, size_t ptsize, const char *text) {
-        TTF_Font *font = getFont(fontname, ptsize);
+    int Theme::getUtf8Width(const char *fontname, size_t ptsize, const char *text) const {
+        TTF_Font *font = getFont(*this, fontname, ptsize);
 
         if (!font)
             return -1;
@@ -166,7 +165,7 @@ NAMESPACE_BEGIN(sdlgui)
 
     void Theme::getTexAndRect(SDL_Renderer *renderer, int x, int y, const char *text,
                               const char *fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect,
-                              SDL_Color *textColor) {
+                              SDL_Color *textColor) const {
         int text_width;
         int text_height;
 
@@ -175,7 +174,7 @@ NAMESPACE_BEGIN(sdlgui)
 
         SDL_Color defColor{255, 255, 255, 0};
 
-        TTF_Font *font = getFont(fontname, ptsize);
+        TTF_Font *font = getFont(*this, fontname, ptsize);
 
         if (!font)
             return;
@@ -203,7 +202,7 @@ NAMESPACE_BEGIN(sdlgui)
 
     void Theme::getTexAndRectUtf8(SDL_Renderer *renderer, int x, int y, const char *text,
                                   const char *fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect,
-                                  SDL_Color *textColor) {
+                                  SDL_Color *textColor) const {
         int text_width;
         int text_height;
 
@@ -212,7 +211,7 @@ NAMESPACE_BEGIN(sdlgui)
 
         SDL_Color defColor{255, 255, 255, 0};
 
-        TTF_Font *font = getFont(fontname, ptsize);
+        TTF_Font *font = getFont(*this, fontname, ptsize);
 
         if (!font)
             return;
