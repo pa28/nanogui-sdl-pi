@@ -1,4 +1,7 @@
-Copyright (c) 2019 dalerank <dalerankn8@gmail.com>, All rights reserved.
+Modifications to original work Copyright (c) 2020 hrbuckley <richard.buckley@ieee.org>,
+all rights reserved.
+
+Derived from NanoGUI-SDL Copyright (c) 2019 dalerank <dalerankn8@gmail.com>, All rights reserved.
 
 Based on NanoGUI library sources by Wenzel Jakob <wenzel.jakob@epfl.ch>
 
