@@ -2,6 +2,7 @@
 // Created by richard on 2020-09-07.
 //
 
+#include <locale>
 #include "PiApplication.h"
 
 PiGraphicsContext::PiGraphicsContext(const sdlgui::Vector2i &position, const sdlgui::Vector2i &size,
@@ -11,7 +12,6 @@ PiGraphicsContext::PiGraphicsContext(const sdlgui::Vector2i &position, const sdl
         mCaption(caption) {
     SDL_Init(SDL_INIT_VIDEO);   // Initialize SDL2
 
-
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
@@ -19,6 +19,8 @@ PiGraphicsContext::PiGraphicsContext(const sdlgui::Vector2i &position, const sdl
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+    std::locale::global(std::locale(""));
 
 #if 0
     SDL_ShowCursor(SDL_DISABLE);    // ToDo: Create a timeout system to SDL_ENABLE/SDL_DISABLE the cursor.

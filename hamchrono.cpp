@@ -8,83 +8,10 @@
 #include <array>
 #include <string_view>
 #include <PiApplication.h>
+#include <sdlgui/timebox.h>
 #include <sdlgui/nanovg.h>
 
 using namespace sdlgui;
-using namespace std;
-using namespace std::chrono;
-
-class TimeBox : public Widget {
-private:
-    static constexpr array<string_view, 7> mDays = {
-            "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
-    static constexpr array<string_view, 12> mMonths = {
-            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-    time_point<system_clock> mEpoch;
-    duration<double> mElapsedSeconds{};
-    bool mIsLocalTime{false};
-    Widget *mTimeDisplay;
-    Widget *mDateDisplay;
-    Label *mHoursMins;
-    Label *mSeconds;
-    Label *mDate;
-
-public:
-    explicit TimeBox(Widget *parent) : Widget(parent) {
-        // Compute an offset which will (hopefully) line hours, mins and secs up by their tops
-        // TODO: Label widgets should set their size based on the font size used.
-        auto timeSizeDiff = std::abs(mTheme->mTimeBoxHoursMinFontSize - mTheme->mTimeBoxSecFontSize);
-
-        // Construct a time Box
-        withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum, 0, 5);
-        mTimeDisplay = this->add<Widget>();
-        mTimeDisplay->withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Minimum, 0, 5);
-        mDateDisplay = this->add<Widget>();
-        mDateDisplay->withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Maximum, 0, 5);
-        mHoursMins = mTimeDisplay->add<Label>("", mTheme->mTimeBoxTimeFont);
-        mHoursMins->setFixedHeight(mTheme->mTimeBoxHoursMinFontSize);
-        mHoursMins->setFontSize(mTheme->mTimeBoxHoursMinFontSize);
-        mSeconds = mTimeDisplay->add<Label>("", mTheme->mTimeBoxTimeFont);
-        mSeconds->setFontSize(mTheme->mTimeBoxSecFontSize);
-        mSeconds->setFixedHeight(mTheme->mTimeBoxSecFontSize + timeSizeDiff/2);
-        mDate = mDateDisplay->add<Label>("", mTheme->mTimeBoxDateFont);
-
-        mEpoch = std::chrono::system_clock::now();
-        renderTime(mEpoch);
-    }
-
-    void renderTime(const time_point<system_clock> &now) {
-        using namespace std::chrono;
-        auto tt = system_clock::to_time_t(now);
-        auto tm = mIsLocalTime ? *localtime(&tt) : *gmtime(&tt);
-
-        stringstream hm;
-        hm << setw(2) << setfill('0') << tm.tm_hour << ':'
-           << setw(2) << setfill('0') << tm.tm_min;
-        mHoursMins->setCaption(hm.str());
-
-        hm.str("");
-        hm << setw(2) << setfill('0') << tm.tm_sec;
-        mSeconds->setCaption(hm.str());
-
-        hm.str("");
-        hm << mDays[tm.tm_wday] << ' ' << mMonths[tm.tm_mon] << ' ' << tm.tm_mday << ", " << tm.tm_year + 1900;
-        mDate->setCaption(hm.str());
-    }
-
-    void draw(SDL_Renderer *renderer) override {
-        auto now = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = now - mEpoch;
-        if ((elapsed_seconds - mElapsedSeconds).count() >= 1.0) {
-            mElapsedSeconds = elapsed_seconds;
-            renderTime(now);
-        }
-        Widget::draw(renderer);
-    }
-};
-
 
 class HamChrono : public PiApplication {
 private:

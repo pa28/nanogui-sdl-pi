@@ -89,6 +89,10 @@ NAMESPACE_BEGIN(sdlgui)
         mTimeBoxTimeFont = "FreeMonoBold";
         mTimeBoxDateFont = "FreeSansBold";
 
+        mTimeBoxHoursMinFmt = "%R";
+        mTimeBoxSecFmt = "%S %Z";
+        mTimeBoxDateFmt= "%a %b %d, %Y";
+
         TTF_Init();
     }
 

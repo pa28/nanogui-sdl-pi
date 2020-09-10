@@ -109,6 +109,10 @@ public:
     std::string mTimeBoxTimeFont;
     std::string mTimeBoxDateFont;
 
+    std::string mTimeBoxHoursMinFmt;
+    std::string mTimeBoxSecFmt;
+    std::string mTimeBoxDateFmt;
+
     [[maybe_unused]] void getTexAndRect(SDL_Renderer *renderer, int x, int y, const char *text,
       const char* fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect, SDL_Color *textColor) const;
 

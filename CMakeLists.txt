@@ -120,6 +120,7 @@ list(APPEND NNGUI_BASIC_SOURCE
      sdlgui/tabwidget.h
      sdlgui/textbox.h
      sdlgui/theme.h
+        sdlgui/timebox.h
      sdlgui/vscrollpanel.h
      sdlgui/switchbox.h
      sdlgui/dropdownbox.h
@@ -155,6 +156,7 @@ list(APPEND NNGUI_BASIC_SOURCE
      sdlgui/switchbox.cpp
      sdlgui/dropdownbox.cpp
      sdlgui/theme.cpp
+        sdlgui/timebox.cpp
      sdlgui/vscrollpanel.cpp
      sdlgui/widget.cpp
      sdlgui/window.cpp
