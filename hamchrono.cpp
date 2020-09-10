@@ -33,7 +33,7 @@ public:
                         .withFixedSize(Vector2i(200, 480));
 
                 pannel1.button("VE3YSH", [] { cout << "QTH Edit\n"; })
-                        .setFontSize(30);
+                        .setFontSize(40);
                 pannel1.wdg<TimeBox>();
 
 //                nwindow.widget().withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum)

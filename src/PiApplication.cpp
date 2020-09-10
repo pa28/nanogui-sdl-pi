@@ -10,7 +10,7 @@ PiGraphicsContext::PiGraphicsContext(const sdlgui::Vector2i &position, const sdl
         mSize(size),
         mPosition(position),
         mCaption(caption) {
-    SDL_Init(SDL_INIT_VIDEO);   // Initialize SDL2
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER);   // Initialize SDL2
 
     SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
     SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);

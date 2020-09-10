@@ -9,8 +9,11 @@
 #include <iostream>
 #include "timebox.h"
 
+static Uint32 TimeBoxCallbackStub(Uint32 interval, void *param);
+
 sdlgui::TimeBox::TimeBox(sdlgui::Widget *parent, const std::string &font, int fontSize)
         : Widget(parent),
+          mTimer(*this, &TimeBox::timerCallback, 1000),
           locale_time_put(use_facet<time_put<char>>(locale())) {
     if (fontSize < 0) {
         mTimeBoxHoursMinFontSize = mTheme->mTimeBoxHoursMinFontSize;
@@ -74,12 +77,25 @@ void sdlgui::TimeBox::renderTime(const std::chrono::time_point<std::chrono::syst
     mDate->setCaption(hm.str());
 }
 
-void sdlgui::TimeBox::draw(SDL_Renderer *renderer) {
+Uint32 TimeBoxCallbackStub(Uint32 interval, void *param) {
+    interval = static_cast<sdlgui::TimeBox*>(param)->timerCallback(interval);
+    std::cout << "New timer interval " << interval << '\n';
+    return interval;
+}
+
+Uint32 sdlgui::TimeBox::timerCallback(Uint32 interval) {
     auto now = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = now - mEpoch;
-    if ((elapsed_seconds - mElapsedSeconds).count() >= 1.0) {
+    auto delta_seconds = elapsed_seconds - mElapsedSeconds;
+    if (delta_seconds.count() > 0.9) {
         mElapsedSeconds = elapsed_seconds;
         renderTime(now);
     }
-    Widget::draw(renderer);
+
+    if (delta_seconds.count() > 1.0)
+        fmod(delta_seconds.count(), 1.0) * 1000.0;
+    else if (delta_seconds.count() < 0.990)
+        return 1000.0 - (delta_seconds.count() * 1000.0);
+
+    return 1000;
 }
