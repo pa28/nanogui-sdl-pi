@@ -11,9 +11,10 @@
 
 static Uint32 TimeBoxCallbackStub(Uint32 interval, void *param);
 
-sdlgui::TimeBox::TimeBox(sdlgui::Widget *parent, const std::string &font, int fontSize)
+sdlgui::TimeBox::TimeBox(sdlgui::Widget *parent, bool localTime, const std::string &font, int fontSize)
         : Widget(parent),
           mTimer(*this, &TimeBox::timerCallback, 1000),
+          mIsLocalTime(localTime),
           locale_time_put(use_facet<time_put<char>>(locale())) {
     if (fontSize < 0) {
         mTimeBoxHoursMinFontSize = mTheme->mTimeBoxHoursMinFontSize;

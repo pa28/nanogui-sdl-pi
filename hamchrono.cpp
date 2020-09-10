@@ -35,6 +35,7 @@ public:
                 pannel1.button("VE3YSH", [] { cout << "QTH Edit\n"; })
                         .setFontSize(40);
                 pannel1.wdg<TimeBox>();
+                pannel1.wdg<TimeBox>(true);
 
 //                nwindow.widget().withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum)
 //                        .withFixedSize(Vector2i( 200, 480 ))

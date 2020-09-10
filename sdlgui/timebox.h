@@ -103,7 +103,7 @@ namespace sdlgui {
          * @param font the font to use or an empty string for the default
          * @param fontSize the font size to use or -1 for the default
          */
-        explicit TimeBox(Widget *parent,
+        explicit TimeBox(Widget *parent, bool localTime = false,
                          const std::string &font = "", int fontSize = -1);
 
         /**
