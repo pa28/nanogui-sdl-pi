@@ -12,10 +12,14 @@
 
 #include <sdlgui/colorwheel.h>
 #include <sdlgui/theme.h>
+#include <sdlgui/nanovg.h>
+
 #if defined(_WIN32)
 #include <SDL.h>
 #else
 #include <SDL2/SDL.h>
+#include "nanovg_rt.h"
+
 #endif
 
 NAMESPACE_BEGIN(sdlgui)
@@ -31,19 +35,20 @@ Vector2i ColorWheel::preferredSize(SDL_Renderer *) const
     return { 100, 100 };
 }
 
-void ColorWheel::draw(SDL_Renderer *renderer) 
+void ColorWheel::draw(SDL_Renderer *ctx)
 {
-/*    Widget::draw(ctx);
+    Widget::draw(ctx);
 
     if (!mVisible)
         return;
 
-    float x = mPos.x(),
-          y = mPos.y(),
-          w = mSize.x(),
-          h = mSize.y();
+    float x = 0,
+          y = 0,
+          w = mSize.x,
+          h = mSize.y;
 
-    SDL_Renderer* vg = ctx;
+    //SDL_Renderer* vg = ctx;
+    NVGcontext *vg = nvgCreateRT(NVG_DEBUG, mSize.x, mSize.y, 0);
 
     int i;
     float r0, r1, ax,ay, bx,by, cx,cy, aeps, r;
@@ -141,7 +146,7 @@ void ColorWheel::draw(SDL_Renderer *renderer)
     nvgRestore(vg);
 
     nvgRestore(vg);
-    */
+
 }
 
 bool ColorWheel::mouseButtonEvent(const Vector2i &p, int button, bool down,
