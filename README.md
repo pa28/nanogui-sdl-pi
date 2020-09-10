@@ -4,7 +4,7 @@ NanoGUI-SDL-Pi is a RaspberryPi port/rewirte for [NanoGUI-SDL](https://github.co
  which is an SDL port for [NanoGUI](https://github.com/wjakob/nanogui)
 
 ## Example screenshot
-![Screenshot](https://github.com/pa28/nanogui-sdl-pi/blob/main/hamchrono.png "Screenshot")
+![Screenshot](https://github.com/pa28/nanogui-sdl-pi/blob/main/hamchrono.png)
 
 ## Description
 NanoGUI-SDL-Pi builds on [SDL2](http://www.libsdl.org/) for cross-platform context
