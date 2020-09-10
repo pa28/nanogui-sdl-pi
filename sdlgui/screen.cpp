@@ -202,7 +202,7 @@ void Screen::drawWidgets()
 
 bool Screen::keyboardEvent(int key, int scancode, int action, int modifiers) 
 {
-    if (mFocusPath.size() > 0) 
+    if (!mFocusPath.empty())
     {
         for (auto it = mFocusPath.rbegin() + 1; it != mFocusPath.rend(); ++it)
             if ((*it)->focused() && (*it)->keyboardEvent(key, scancode, action, modifiers))
