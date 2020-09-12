@@ -8,26 +8,12 @@
 #include <array>
 #include <string_view>
 #include <PiApplication.h>
+#include <ImageDisplay.h>
 #include <sdlgui/timebox.h>
 #include <sdlgui/nanovg.h>
 #include "Adafruit_RA8875.h"
 
 using namespace sdlgui;
-
-class HomeQTH : public Widget {
-private:
-    Button *mCallsign;
-    TimeBox *mTimebox;
-
-public:
-    HomeQTH(Widget *parent, const std::string callsign, int callsignFontSize, bool localTime = false,
-    const std::string &font = "", int fontSize = -1) : Widget(parent) {
-        withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum, 0, 5);
-        mCallsign = this->add<Button>(callsign);
-        mCallsign->setFontSize(callsignFontSize);
-        mTimebox = this->add<TimeBox>(localTime, font, fontSize);
-    }
-};
 
 class HamChrono : public PiApplication {
 private:
@@ -41,19 +27,9 @@ public:
             {
                 auto topPanelH = FB_YRES - EARTH_BIG_H;
 
-                auto &nwindow = framelessWindow(/*"Button demo", graphicsContext.Position()*/)
-                        //.withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Minimum, 0, 0)
+                auto &nwindow = framelessWindow()
                         .withPosition(graphicsContext.Position())
                         .withFixedSize(graphicsContext.Size());
-
-                auto mapTexture = sdlgui::get_texture(SDL_GetRenderer(&graphicsContext.GetWindow()),
-                                                      "maps/day_earth.png", EARTH_BIG_W);
-
-                auto sun1Tex = sdlgui::get_texture(SDL_GetRenderer(&graphicsContext.GetWindow()),
-                                                   "images/AIA 193 Å.jpg", topPanelH);
-
-                auto sun2Tex = sdlgui::get_texture(SDL_GetRenderer(&graphicsContext.GetWindow()),
-                                                   "images/AIA 211 Å, 193 Å, 171 Å.jpg", topPanelH);
 
                 nwindow.wdg<Button>("VE3YSH", [] { cout << "QTH Edit\n"; })
                         .withPosition(Vector2i(0, 0))
@@ -61,12 +37,32 @@ public:
 
                 nwindow.wdg<TimeBox>().withPosition(Vector2i(0, 55));
 
-                nwindow.wdg<ImageView>(sun1Tex).withPosition(Vector2i( 180, 0));
+                ListImages sun_images = loadImageDirectory(SDL_GetRenderer(&graphicsContext.GetWindow()), "images", 0);
+                ListImages map_images = loadImageDirectory(SDL_GetRenderer(&graphicsContext.GetWindow()), "maps", 0);
 
-                nwindow.wdg<ImageView>(sun2Tex).withPosition(Vector2i( 180 + topPanelH, 0));
+                nwindow.wdg<ImageDisplay>(sun_images)
+                        .setCallback([](ImageDisplay &w, ImageDisplay::EventType e) {
+                            switch(e) {
+                                case ImageDisplay::RIGHT_EVENT:
+                                case ImageDisplay::DOWN_EVENT:
+                                    w.setImageIndex(w.getImageIndex()+1);
+                                    break;
+                                case ImageDisplay::LEFT_EVENT:
+                                case ImageDisplay::UP_EVENT:
+                                    w.setImageIndex(w.getImageIndex()-1);
+                                    break;
+                            }
+                        })
+                        .withFixedSize(Vector2i(topPanelH, topPanelH))
+                        .withPosition(Vector2i(170, 0));
 
-                nwindow.wdg<ImageView>(mapTexture)
-                        .withPosition(Vector2i(FB_XRES-EARTH_BIG_W,FB_YRES - EARTH_BIG_H));
+                nwindow.wdg<ImageDisplay>(map_images)
+                        .withImageIndex(1)
+                        .withFixedSize(Vector2i(EARTH_BIG_W, EARTH_BIG_H))
+                        .withPosition(Vector2i(FB_XRES - EARTH_BIG_W, FB_YRES - EARTH_BIG_H));
+//
+//                nwindow.wdg<ImageView>(map_images[1].tex)
+//                        .withPosition(Vector2i(FB_XRES-EARTH_BIG_W,FB_YRES - EARTH_BIG_H));
 
 
 //                nwindow.widget().withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum)
