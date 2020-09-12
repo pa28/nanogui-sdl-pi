@@ -47,7 +47,7 @@ class  Widget : public Object
 {
 public:
     /// Construct a new widget with the given parent widget
-    Widget(Widget *parent);
+    explicit Widget(Widget *parent);
 
     /// Return the parent widget
     Widget *parent() { return mParent; }
@@ -290,7 +290,7 @@ public:
 
     Widget& _and() { return *parent(); }
     Widget& withId(const std::string& id) { setId(id); return *this; }
-    
+
     Widget& withPosition( const Vector2i& pos ) { setPosition( pos); return *this; }
     Widget& withFontSize(int size) { setFontSize(size); return *this; }
     Widget& withFixedSize(const Vector2i& size) { setFixedSize(size); return *this; }
