@@ -201,6 +201,7 @@ if (NANOGUI_BUILD_EXAMPLE)
     else ()
         file(COPY resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
         file(COPY resources/images DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+        file(COPY resources/maps/day_earth.png resources/maps/night_earth.png DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/maps)
     endif ()
 endif ()
 
