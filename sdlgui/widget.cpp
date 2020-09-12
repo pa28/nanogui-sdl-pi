@@ -230,11 +230,32 @@ Window *Widget::window()
         if (!widget)
             throw std::runtime_error(
                 "Widget:internal error (could not find parent window)");
-        Window *window = dynamic_cast<Window *>(widget);
+        auto window = dynamic_cast<Window *>(widget);
         if (window)
             return window;
+
         widget = widget->parent();
     }
+}
+
+const Screen * Widget::screen() {
+    Widget *widget = this;
+    while (true)
+    {
+        if (!widget)
+            throw std::runtime_error(
+                    "Widget:internal error (could not find parent window)");
+        auto window = dynamic_cast<Window *>(widget);
+        auto framelessWindow = dynamic_cast<FramelessWindow *>(widget);
+
+        if (window)
+            return dynamic_cast<const Screen *>(window->parent());
+        if (framelessWindow)
+            return dynamic_cast<const Screen *>(framelessWindow->parent());
+
+        widget = widget->parent();
+    }
+
 }
 
 int Widget::getAbsoluteLeft() const

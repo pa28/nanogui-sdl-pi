@@ -18,6 +18,7 @@
 NAMESPACE_BEGIN(sdlgui)
 
 class Window;
+class FramelessWindow;
 class Label;
 class ToolButton;
 class MessageDialog;
@@ -27,6 +28,7 @@ class ComboBox;
 class CheckBox;
 class VScrollPanel;
 class ProgressBar;
+class Screen;
 class Slider;
 class ImagePanel;
 class DropdownBox;
@@ -187,6 +189,7 @@ public:
 
     /// Walk up the hierarchy and return the parent window
     Window *window();
+    const Screen * screen();
 
     /// Associate this widget with an ID value (optional)
     void setId(const std::string &id) { mId = id; }

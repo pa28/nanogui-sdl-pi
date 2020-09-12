@@ -261,7 +261,7 @@ void ImageView::draw(SDL_Renderer* renderer)
 
     SDL_Point ap = getAbsolutePos();
 
-    const Screen* screen = dynamic_cast<const Screen*>(this->window()->parent());
+    const Screen* screen = this->screen();
     assert(screen);
     Vector2f screenSize = screen->size().tofloat();
     Vector2f scaleFactor = imageSizeF().cquotient(screenSize) * mScale;
