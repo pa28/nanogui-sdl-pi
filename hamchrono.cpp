@@ -10,8 +10,24 @@
 #include <PiApplication.h>
 #include <sdlgui/timebox.h>
 #include <sdlgui/nanovg.h>
+#include "Adafruit_RA8875.h"
 
 using namespace sdlgui;
+
+class HomeQTH : public Widget {
+private:
+    Button *mCallsign;
+    TimeBox *mTimebox;
+
+public:
+    HomeQTH(Widget *parent, const std::string callsign, int callsignFontSize, bool localTime = false,
+    const std::string &font = "", int fontSize = -1) : Widget(parent) {
+        withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum, 0, 5);
+        mCallsign = this->add<Button>(callsign);
+        mCallsign->setFontSize(callsignFontSize);
+        mTimebox = this->add<TimeBox>(localTime, font, fontSize);
+    }
+};
 
 class HamChrono : public PiApplication {
 private:
@@ -23,19 +39,35 @@ public:
     explicit HamChrono(PiGraphicsContext &graphicsContext) : PiApplication(graphicsContext) {
         {
             {
+                auto topPanelH = FB_YRES - EARTH_BIG_H;
+
                 auto &nwindow = framelessWindow(/*"Button demo", graphicsContext.Position()*/)
-                        .withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Minimum, 0, 0)
+                        //.withLayout<BoxLayout>(Orientation::Horizontal, Alignment::Minimum, 0, 0)
                         .withPosition(graphicsContext.Position())
                         .withFixedSize(graphicsContext.Size());
 
-                auto &pannel1 = nwindow.add<Widget>()
-                        ->withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum, 10, 10)
-                        .withFixedSize(Vector2i(200, 480));
+                auto mapTexture = sdlgui::get_texture(SDL_GetRenderer(&graphicsContext.GetWindow()),
+                                                      "maps/day_earth.png", EARTH_BIG_W);
 
-                pannel1.button("VE3YSH", [] { cout << "QTH Edit\n"; })
+                auto sun1Tex = sdlgui::get_texture(SDL_GetRenderer(&graphicsContext.GetWindow()),
+                                                   "images/latest_512_0193.jpg", topPanelH);
+
+                auto sun2Tex = sdlgui::get_texture(SDL_GetRenderer(&graphicsContext.GetWindow()),
+                                                   "images/latest_512_211193171.jpg", topPanelH);
+
+                nwindow.wdg<Button>("VE3YSH", [] { cout << "QTH Edit\n"; })
+                        .withPosition(Vector2i(0, 0))
                         .setFontSize(40);
-                pannel1.wdg<TimeBox>();
-                pannel1.wdg<TimeBox>(true);
+
+                nwindow.wdg<TimeBox>().withPosition(Vector2i(0, 55));
+
+                nwindow.wdg<ImageView>(sun1Tex).withPosition(Vector2i( 180, 0));
+
+                nwindow.wdg<ImageView>(sun2Tex).withPosition(Vector2i( 180 + topPanelH, 0));
+
+                nwindow.wdg<ImageView>(mapTexture)
+                        .withPosition(Vector2i(FB_XRES-EARTH_BIG_W,FB_YRES - EARTH_BIG_H));
+
 
 //                nwindow.widget().withLayout<BoxLayout>(Orientation::Vertical, Alignment::Minimum)
 //                        .withFixedSize(Vector2i( 200, 480 ))
