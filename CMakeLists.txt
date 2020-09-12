@@ -73,6 +73,13 @@ include_directories(${SDL2_INCLUDE_DIR})
 include_directories(${SDL2TTF_INCLUDE_DIR})
 include_directories(${SDL2_IMAGE_INCLUDE_DIR})
 
+FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/resources/maps)
+ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_BINARY_DIR}/resources/maps/dearth-big.cpp ${CMAKE_BINARY_DIR}/resources/maps/nearth-big.cpp
+        COMMAND tar -C ${CMAKE_BINARY_DIR}/resources/maps -xf ${CMAKE_SOURCE_DIR}/resources/maps/earth-big.tgz
+        DEPENDS ${CMAKE_SOURCE_DIR}/resources/maps/earth-big.tgz)
+
+set(HAMCLOCK_MAP_SOURCE ${CMAKE_BINARY_DIR}/resources/maps/dearth-big.cpp ${CMAKE_BINARY_DIR}/resources/maps/nearth-big.cpp)
+
 # Required core libraries on various platforms
 if (WIN32)
     list(APPEND NNGUI_EXTRA_LIBS opengl32)
@@ -197,7 +204,7 @@ if (NANOGUI_BUILD_EXAMPLE)
     endif ()
 endif ()
 
-add_executable(hamchrono ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} ${HAM_SOURCES} hamchrono.cpp)
+add_executable(hamchrono ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} ${HAM_SOURCES} ${HAMCLOCK_MAP_SOURCE} hamchrono.cpp)
 set_target_properties(
         hamchrono PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
