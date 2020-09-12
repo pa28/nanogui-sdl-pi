@@ -50,10 +50,10 @@ public:
                                                       "maps/day_earth.png", EARTH_BIG_W);
 
                 auto sun1Tex = sdlgui::get_texture(SDL_GetRenderer(&graphicsContext.GetWindow()),
-                                                   "images/latest_512_0193.jpg", topPanelH);
+                                                   "images/AIA 193 Å.jpg", topPanelH);
 
                 auto sun2Tex = sdlgui::get_texture(SDL_GetRenderer(&graphicsContext.GetWindow()),
-                                                   "images/latest_512_211193171.jpg", topPanelH);
+                                                   "images/AIA 211 Å, 193 Å, 171 Å.jpg", topPanelH);
 
                 nwindow.wdg<Button>("VE3YSH", [] { cout << "QTH Edit\n"; })
                         .withPosition(Vector2i(0, 0))
