@@ -90,6 +90,10 @@ void ImageView::center()
 void ImageView::fit() 
 {
     // Calculate the appropriate scaling factor.
+    auto sf = sizeF();
+    auto isf = imageSizeF();
+    auto cq = sf.cquotient(isf);
+    mScale = cq.minCoeff();
     mScale = (sizeF().cquotient(imageSizeF())).minCoeff();
     center();
 }
