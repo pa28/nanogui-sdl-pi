@@ -116,6 +116,7 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
             auto [latS, lonS] = subSolar();
             auto *pixels = (Uint32 *) tran_day_map->pixels;
             for (int x = 0; x < tran_day_map->w; x+=1) {
+                std::cout << "Rendering trans " << x << std::endl;
                 for (int y = 0; y < tran_day_map->h; y+=1) {
                     auto lonE = (double)(x - tran_day_map->w/2) * M_PI / (double)(tran_day_map->w/2)
                             + deg2rad(mCentreLongitude);
@@ -166,6 +167,7 @@ void sdlgui::GeoChrono::generateMapSurfaces(SDL_Renderer *renderer) {
     auto offx = computOffset();
 
     for (int x = 0; x < EARTH_BIG_W; ++x) {
+        std::cout << "Rendering maps " << x << std::endl;
         for (int y = 0; y < EARTH_BIG_H; ++y) {
             auto xMap = (x + offx) % EARTH_BIG_W;
             {
