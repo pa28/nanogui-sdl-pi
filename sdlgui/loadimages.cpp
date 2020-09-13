@@ -3,34 +3,39 @@
 #if defined(_WIN32)
 #include <SDL.h>
 #else
+
 #include <SDL2/SDL.h>
+
 #endif
 #if defined(_WIN32)
 #include <windows.h>
 #else
+
 #include <dirent.h>
+
 #endif
 
 #if defined(_WIN32)
 #include <SDL_image.h>
 #else
+
 #include <SDL2/SDL_image.h>
+
 #endif
 
 NAMESPACE_BEGIN(sdlgui)
 
-    SDL_Texture * get_texture(
-            SDL_Renderer * pRenderer,
-            const std::string& image_filename,
+    SDL_Texture *get_texture(
+            SDL_Renderer *pRenderer,
+            const std::string &image_filename,
             const int limit) {
-        SDL_Texture * result = nullptr;
+        SDL_Texture *result = nullptr;
 
-        SDL_Surface * pSurface = IMG_Load(image_filename.c_str());
+        SDL_Surface *pSurface = IMG_Load(image_filename.c_str());
 
         if (pSurface == nullptr) {
             printf("Error image load: %s\n", IMG_GetError());
-        }
-        else {
+        } else {
             int width = pSurface->w;
             int height = pSurface->h;
 
@@ -42,8 +47,8 @@ NAMESPACE_BEGIN(sdlgui)
                 sourceDimensions.w = width;
                 sourceDimensions.h = height;
 
-                float scale = (float)limit / (float)width;
-                float scaleH = (float)limit / (float)height;
+                float scale = (float) limit / (float) width;
+                float scaleH = (float) limit / (float) height;
 
                 if (scaleH < scale) {
                     scale = scaleH;
@@ -52,8 +57,8 @@ NAMESPACE_BEGIN(sdlgui)
                 SDL_Rect targetDimensions;
                 targetDimensions.x = 0;
                 targetDimensions.y = 0;
-                targetDimensions.w = (int)((float)width * scale);
-                targetDimensions.h = (int)((float)height * scale);
+                targetDimensions.w = (int) ((float) width * scale);
+                targetDimensions.h = (int) ((float) height * scale);
 
                 // create a 32 bits per pixel surface to Blit the image to first, before BlitScaled
                 // https://stackoverflow.com/questions/33850453/sdl2-blit-scaled-from-a-palettized-8bpp-surface-gives-error-blit-combination/33944312
@@ -69,8 +74,7 @@ NAMESPACE_BEGIN(sdlgui)
 
                 if (SDL_BlitSurface(pSurface, nullptr, p32BPPSurface, nullptr) < 0) {
                     printf("Error did not blit surface: %s\n", SDL_GetError());
-                }
-                else {
+                } else {
                     // create another 32 bits per pixel surface are the desired scale
                     SDL_Surface *pScaleSurface = SDL_CreateRGBSurface(
                             p32BPPSurface->flags,
@@ -92,8 +96,7 @@ NAMESPACE_BEGIN(sdlgui)
 
                         SDL_FreeSurface(pScaleSurface);
                         pScaleSurface = nullptr;
-                    }
-                    else {
+                    } else {
                         SDL_FreeSurface(pSurface);
 
                         pSurface = pScaleSurface;
@@ -106,12 +109,11 @@ NAMESPACE_BEGIN(sdlgui)
                 p32BPPSurface = nullptr;
             }
 
-            SDL_Texture * pTexture = SDL_CreateTextureFromSurface(pRenderer, pSurface);
+            SDL_Texture *pTexture = SDL_CreateTextureFromSurface(pRenderer, pSurface);
 
             if (pTexture == nullptr) {
                 printf("Error image load: %s\n", SDL_GetError());
-            }
-            else {
+            } else {
                 SDL_SetTextureBlendMode(
                         pTexture,
                         SDL_BLENDMODE_BLEND);
@@ -126,51 +128,64 @@ NAMESPACE_BEGIN(sdlgui)
         return result;
     }
 
-ListImages loadImageDirectory(SDL_Renderer *renderer, const std::string &path, const int limit)
-{
-  ListImages result;
-#if !defined(_WIN32)
-    DIR *dp = opendir(path.c_str());
-    if (!dp)
-        throw std::runtime_error("Could not open image directory!");
-    struct dirent *ep;
-    while ((ep = readdir(dp))) {
-        const char *fname = ep->d_name;
-#else
-    WIN32_FIND_DATA ffd;
-    std::string searchPath = path + "/*.*";
-    HANDLE handle = FindFirstFileA(searchPath.c_str(), &ffd);
-    if (handle == INVALID_HANDLE_VALUE)
-        throw std::runtime_error("Could not open image directory!");
-    do {
-        const char *fname = ffd.cFileName;
-#endif
-        if (strstr(fname, "png") == nullptr && strstr(fname, "jpg") == nullptr)
-            continue;
-        std::string fullName = path + "/" + std::string(fname);
+    ImageInfo loadImage(SDL_Renderer *renderer, const std::string &path) {
         SDL_Texture *tex;
 
-        if (limit == 0)
-            tex = IMG_LoadTexture(renderer, fullName.c_str());
-        else
-            tex = get_texture(renderer, fullName, limit);
+        tex = IMG_LoadTexture(renderer, path.c_str());
 
         if (tex == nullptr)
             throw std::runtime_error("Could not open image data!");
         ImageInfo iminfo;
         iminfo.tex = tex;
-        iminfo.path = fullName;
+        iminfo.path = path;
         SDL_QueryTexture(tex, nullptr, nullptr, &iminfo.w, &iminfo.h);
-        
-        result.push_back(iminfo);
-#if !defined(_WIN32)
+        return iminfo;
     }
-    closedir(dp);
+
+    ListImages loadImageDirectory(SDL_Renderer *renderer, const std::string &path, const int limit) {
+        ListImages result;
+#if !defined(_WIN32)
+        DIR *dp = opendir(path.c_str());
+        if (!dp)
+            throw std::runtime_error("Could not open image directory!");
+        struct dirent *ep;
+        while ((ep = readdir(dp))) {
+            const char *fname = ep->d_name;
 #else
-    } while (FindNextFileA(handle, &ffd) != 0);
-    FindClose(handle);
+            WIN32_FIND_DATA ffd;
+            std::string searchPath = path + "/*.*";
+            HANDLE handle = FindFirstFileA(searchPath.c_str(), &ffd);
+            if (handle == INVALID_HANDLE_VALUE)
+                throw std::runtime_error("Could not open image directory!");
+            do {
+                const char *fname = ffd.cFileName;
 #endif
-    return result;
-}
+            if (strstr(fname, "png") == nullptr && strstr(fname, "jpg") == nullptr)
+                continue;
+            std::string fullName = path + "/" + std::string(fname);
+            SDL_Texture *tex;
+
+            if (limit == 0)
+                tex = IMG_LoadTexture(renderer, fullName.c_str());
+            else
+                tex = get_texture(renderer, fullName, limit);
+
+            if (tex == nullptr)
+                throw std::runtime_error("Could not open image data!");
+            ImageInfo iminfo;
+            iminfo.tex = tex;
+            iminfo.path = fullName;
+            SDL_QueryTexture(tex, nullptr, nullptr, &iminfo.w, &iminfo.h);
+
+            result.push_back(iminfo);
+#if !defined(_WIN32)
+        }
+        closedir(dp);
+#else
+        } while (FindNextFileA(handle, &ffd) != 0);
+        FindClose(handle);
+#endif
+        return result;
+    }
 
 NAMESPACE_END(sdlgui)

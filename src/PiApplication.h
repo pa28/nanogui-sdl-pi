@@ -8,6 +8,7 @@
 #include <string>
 #include <string_view>
 #include <SDL_render.h>
+#include <SDL2/SDL_image.h>
 #include <sdlgui/common.h>
 #include <sdlgui/screen.h>
 #include <sdlgui/screen.h>

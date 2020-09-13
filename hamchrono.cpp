@@ -9,6 +9,7 @@
 #include <string_view>
 #include <PiApplication.h>
 #include <ImageDisplay.h>
+#include <GeoChrono.h>
 #include <sdlgui/timebox.h>
 #include <sdlgui/nanovg.h>
 #include "Adafruit_RA8875.h"
@@ -40,6 +41,9 @@ public:
                 ListImages sun_images = loadImageDirectory(SDL_GetRenderer(&graphicsContext.GetWindow()), "images", 0);
                 ListImages map_images = loadImageDirectory(SDL_GetRenderer(&graphicsContext.GetWindow()), "maps", 0);
 
+                auto map_day = loadImage(SDL_GetRenderer(&graphicsContext.GetWindow()),"maps/day_earth.png");
+                auto map_night = loadImage(SDL_GetRenderer(&graphicsContext.GetWindow()), "maps/night_earth.png");
+
                 nwindow.wdg<ImageDisplay>(sun_images)
                         .setCallback([](ImageDisplay &w, ImageDisplay::EventType e) {
                             switch(e) {
@@ -56,8 +60,12 @@ public:
                         .withFixedSize(Vector2i(topPanelH, topPanelH))
                         .withPosition(Vector2i(170, 0));
 
-                nwindow.wdg<ImageDisplay>(map_images)
-                        .withImageIndex(1)
+//                nwindow.wdg<ImageDisplay>(map_images)
+//                        .withImageIndex(1)
+//                        .withFixedSize(Vector2i(EARTH_BIG_W, EARTH_BIG_H))
+//                        .withPosition(Vector2i(FB_XRES - EARTH_BIG_W, FB_YRES - EARTH_BIG_H));
+
+                nwindow.wdg<GeoChrono>(map_day, map_night)
                         .withFixedSize(Vector2i(EARTH_BIG_W, EARTH_BIG_H))
                         .withPosition(Vector2i(FB_XRES - EARTH_BIG_W, FB_YRES - EARTH_BIG_H));
 //
