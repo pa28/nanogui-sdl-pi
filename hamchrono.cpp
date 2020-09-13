@@ -65,7 +65,8 @@ public:
 //                        .withFixedSize(Vector2i(EARTH_BIG_W, EARTH_BIG_H))
 //                        .withPosition(Vector2i(FB_XRES - EARTH_BIG_W, FB_YRES - EARTH_BIG_H));
 
-                nwindow.wdg<GeoChrono>(map_day, map_night)
+                nwindow.wdg<GeoChrono>()
+                        .withCentreLongitude(-76.0)
                         .withFixedSize(Vector2i(EARTH_BIG_W, EARTH_BIG_H))
                         .withPosition(Vector2i(FB_XRES - EARTH_BIG_W, FB_YRES - EARTH_BIG_H));
 //

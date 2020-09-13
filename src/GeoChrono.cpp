@@ -10,6 +10,8 @@
 #include <sdlgui/common.h>
 #include <sdlgui/screen.h>
 #include <iomanip>
+#include <cmath>
+#include <tuple>
 #include "GeoChrono.h"
 
 bool sdlgui::GeoChrono::mouseMotionEvent(const sdlgui::Vector2i &p, const sdlgui::Vector2i &rel, int button,
@@ -66,7 +68,10 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
     PntRect clip = getAbsoluteCliprect();
     SDL_Rect clipRect = pntrect2srect(clip);
 
-    if (mForeground.tex) {
+    if (mMapsDirty)
+        generateMapSurfaces(renderer);
+
+    if (mDayMap) {
         Vector2i p = Vector2i(0, 0);
         p += Vector2i(ax, ay);
         int imgw = mForeground.w;
@@ -102,24 +107,43 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
         }
 
         if (mTextureDirty) {
-            auto day_map = IMG_Load("maps/day_earth.png");
-            SDL_SetSurfaceBlendMode(day_map,
+            SDL_SetSurfaceBlendMode(mDayMap,
                                     SDL_BLENDMODE_BLEND);
-            auto tran_day_map = SDL_CreateRGBSurface(0, mForeground.w, mForeground.h, 32, rmask, gmask, bmask, amask);
-//        SDL_FillRect(tran_day_map, nullptr, SDL_MapRGBA(tran_day_map->format, 0x00,0x00,0x00,0x8));
-            SDL_SetSurfaceBlendMode(day_map, SDL_BLENDMODE_BLEND);
-            SDL_BlitSurface(day_map, nullptr, tran_day_map, nullptr);
+            auto tran_day_map = SDL_CreateRGBSurface(0, mDayMap->w, mDayMap->h, 32, rmask, gmask, bmask, amask);
+            SDL_SetSurfaceBlendMode(mDayMap, SDL_BLENDMODE_BLEND);
+            SDL_BlitSurface(mDayMap, nullptr, tran_day_map, nullptr);
 
-//        std::cout << std::setbase(16) << SDL_MapRGBA(tran_day_map->format, 0x80,0xC0,0xE0,0xFF) << '\n';
-
+            auto [latS, lonS] = subSolar();
             auto *pixels = (Uint32 *) tran_day_map->pixels;
-            for (int x = 0; x < tran_day_map->w; ++x) {
-                for (int y = 0; y < tran_day_map->h; ++y) {
-                    pixels[(y * tran_day_map->w) + x] = set_a_value(pixels[(y * tran_day_map->w) + x], 0x0FU);
+            for (int x = 0; x < tran_day_map->w; x+=1) {
+                for (int y = 0; y < tran_day_map->h; y+=1) {
+                    auto lonE = (double)(x - tran_day_map->w/2) * M_PI / (double)(tran_day_map->w/2)
+                            + deg2rad(mCentreLongitude);
+                    auto latE = (double)(tran_day_map->h/2 - y) * M_PI_2 / (double)(tran_day_map->h/2);
+                    auto cosDeltaSigma = sin(latS)*sin(latE) + cos(latS)*cos(latE)*cos(abs(lonS-lonE));
+                    uint32_t alpha = 255;
+                    double fract_day;
+                    if (cosDeltaSigma < 0) {
+                        if (cosDeltaSigma > GrayLineCos) {
+                            fract_day = 1.0 - pow(cosDeltaSigma / GrayLineCos, GrayLinePow);
+                            alpha = (uint32_t) (fract_day * 247.0) + 8;
+                        } else
+                            alpha = 8;
+                    }
+                    auto pixel = set_a_value(pixels[(y * tran_day_map->w) + x], alpha);
+                    pixels[(y * tran_day_map->w) + x] = pixel;
+//                    std::cout << latE << ' ' << lonE << ' '
+//                        << acos(cosDeltaSigma) << ' '
+//                        << fract_day << ' '
+//                        << alpha << '\n';
                 }
+//                std::cout << '\n';
             }
 
             mForeground.tex = SDL_CreateTextureFromSurface(renderer, tran_day_map);
+            mForeground.h = tran_day_map->h;
+            mForeground.w = tran_day_map->w;
+            mForeground.path = "*autogen*";
             mTextureDirty = false;
         }
 
@@ -133,4 +157,65 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
     }
 
     Widget::draw(renderer);
+}
+
+void sdlgui::GeoChrono::generateMapSurfaces(SDL_Renderer *renderer) {
+    mDayMap = SDL_CreateRGBSurface(0, EARTH_BIG_W, EARTH_BIG_H, 32, rmask, gmask, bmask, amask);
+    mNightMap = SDL_CreateRGBSurface(0, EARTH_BIG_W, EARTH_BIG_H, 32, rmask, gmask, bmask, amask);
+
+    auto offx = computOffset();
+
+    for (int x = 0; x < EARTH_BIG_W; ++x) {
+        for (int y = 0; y < EARTH_BIG_H; ++y) {
+            auto xMap = (x + offx) % EARTH_BIG_W;
+            {
+                auto pixels = (uint32_t *) mDayMap->pixels;
+                auto[r, g, b] = Adafruit_RA8875::get_RGB_separate(x, y, Adafruit_RA8875::DAY_MAP);
+                pixels[(y * EARTH_BIG_W) + xMap] = SDL_MapRGBA(mDayMap->format, r, g, b, 255);
+            }
+            {
+                auto pixels = (uint32_t *) mNightMap->pixels;
+                auto[r, g, b] = Adafruit_RA8875::get_RGB_separate(x, y, Adafruit_RA8875::NIGHT_MAP);
+                pixels[(y * EARTH_BIG_W) + xMap] = SDL_MapRGBA(mNightMap->format, r, g, b, 255);
+            }
+        }
+
+        mBackground.tex = SDL_CreateTextureFromSurface(renderer, mNightMap);
+        mBackground.w = EARTH_BIG_W;
+        mBackground.h = EARTH_BIG_H;
+        mBackground.path = "*auto_gen*";
+
+        mMapsDirty = false;
+    }
+}
+
+Uint32 sdlgui::GeoChrono::timerCallback(Uint32 interval) {
+    std::cout << __PRETTY_FUNCTION__ << '\n';
+    mMapsDirty = true;
+    mTextureDirty = true;
+    return interval;
+}
+
+std::tuple<double, double> sdlgui::subSolar() {
+    using namespace std::chrono;
+    auto epoch = system_clock::now();
+    time_t tt = system_clock::to_time_t(epoch);
+
+    double JD = (tt/86400.0) + 2440587.5;
+    double D = JD - 2451545.0;
+    double g = 357.529 + 0.98560028*D;
+    double q = 280.459 + 0.98564736*D;
+    double L = q + 1.915*sin(M_PI/180*g) + 0.020*sin(M_PI/180*2*g);
+    double e = 23.439 - 0.00000036*D;
+    double RA = 180/M_PI*atan2 (cos(M_PI/180*e)*sin(M_PI/180*L), cos(M_PI/180*L));
+    auto lat = asin(sin(M_PI/180*e)*sin(M_PI/180*L));
+    auto lat_d = rad2deg(lat);
+#ifdef LINIX_STANDALONE_TEST
+    printf ("Solar RA %g hours, Dec %g degrees\n", RA/15, 180/M_PI*ll.lat);
+#endif // LINIX_STANDALONE_TEST
+    double GMST = fmod(15*(18.697374558 + 24.06570982441908*D), 360.0);
+    auto lng_d = fmod(RA-GMST+36000.0+180.0, 360.0) - 180.0;
+    auto lng = deg2rad(lng_d);
+
+    return std::make_tuple(lat, lng);
 }

@@ -7,10 +7,19 @@
 
 #include <sdlgui/common.h>
 #include <sdlgui/widget.h>
+#include <sdlgui/timebox.h>
+#include <Adafruit_RA8875.h>
 
 #include <utility>
+#include <chrono>
 
 namespace sdlgui {
+
+    constexpr double deg2rad(double deg) { return deg * M_PI / 180.; }
+
+    constexpr double rad2deg(double rad) { return rad * 180. / M_PI; }
+
+    std::tuple<double, double> subSolar();
 
     /**
      * @class GeoChrono
@@ -22,17 +31,45 @@ namespace sdlgui {
             UP_EVENT, LEFT_EVENT, DOWN_EVENT, RIGHT_EVENT, CLICK_EVENT
         };
 
+        static constexpr double GrayLineCos = -0.208;
+        static constexpr double GrayLinePow = 0.75;
+
+        Timer<GeoChrono> mTimer;
+
     private:
         ImageInfo mForeground;      //< The foreground image
         ImageInfo mBackground;      //< The background image
+        SDL_Surface *mDayMap;       //< The surface holding the day map
+        SDL_Surface *mNightMap;     //< The surface holding the night map
         bool mTextureDirty{true};   //< True when the image needs to be re-drawn
+        bool mMapsDirty{true};      //< True when the map surfaces need to be re-drawn
 
         bool mButton{false};        //< True when button 1 has been pressed
         bool mMotion{false};        //< True when the mouse has been in motion with button 1 pressed
         Vector2i mMotionStart{};    //< The starting point of the motion;
         Vector2i mMotionEnd{};      //< The ending point of the motion;
 
+        double mCentreLongitude;    //< The longitude (in degrees, West negative) to center the map on.
+
         std::function<void(GeoChrono &, EventType)> mCallback;
+
+        /**
+         * The timer callback
+         * @param interval
+         * @return the new interval
+         */
+        Uint32 timerCallback(Uint32 interval);
+
+
+        /**
+         * Generate day and night surfaces from compiled in data.
+         */
+        void generateMapSurfaces(SDL_Renderer *renderer);
+
+        auto computOffset() const {
+            return ((unsigned long) round((((180.0 - mCentreLongitude) / 360.0)
+                                           * (double) EARTH_BIG_W) + (double) EARTH_BIG_W / 2)) % EARTH_BIG_W;
+        }
 
     public:
         /**
@@ -40,17 +77,8 @@ namespace sdlgui {
          * Construct a GeoChrono with no images
          * @param parent
          */
-        explicit GeoChrono(Widget *parent) : Widget(parent) {}
-
-        /**
-         * (Constructor)
-         * Construct a GeoChrono with images
-         * @param parent
-         * @param foreground the foreground image
-         * @param background the background image
-         */
-        GeoChrono(Widget *parent, ImageInfo foreground, ImageInfo background)
-                : Widget(parent), mForeground(std::move(foreground)), mBackground(std::move(background)) {}
+        explicit GeoChrono(Widget *parent) : Widget(parent), mTimer(*this, &GeoChrono::timerCallback, 60000),
+                                             mDayMap{nullptr}, mNightMap{nullptr}, mCentreLongitude{0} {}
 
         bool mouseMotionEvent(const Vector2i &p, const Vector2i &rel, int button, int modifiers) override;
 
@@ -79,6 +107,18 @@ namespace sdlgui {
          */
         GeoChrono &withBackground(ImageInfo &background) {
             mBackground = background;
+            return *this;
+        }
+
+        /**
+         * Building help, set the centre longitude.
+         * @param centreLongitude in degrees, West is negative
+         * @return a reference to this GeoChrono.
+         */
+        GeoChrono &withCentreLongitude(double centreLongitude) {
+            mCentreLongitude = centreLongitude;
+            mMapsDirty = true;
+            mTextureDirty = true;
             return *this;
         }
 
