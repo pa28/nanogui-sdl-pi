@@ -13,6 +13,10 @@
 #include <utility>
 #include <chrono>
 
+
+static constexpr int USE_COMPILED_MAPS = 0;
+static constexpr int USER_SET_CENTRE_LONG = 0;
+
 namespace sdlgui {
 
     constexpr double deg2rad(double deg) { return deg * M_PI / 180.; }
@@ -67,8 +71,12 @@ namespace sdlgui {
         void generateMapSurfaces(SDL_Renderer *renderer);
 
         auto computOffset() const {
+#if USER_SET_CENTRE_LONG
             return ((unsigned long) round((((180.0 - mCentreLongitude) / 360.0)
                                            * (double) EARTH_BIG_W) + (double) EARTH_BIG_W / 2)) % EARTH_BIG_W;
+#else
+            return 0;
+#endif
         }
 
     public:

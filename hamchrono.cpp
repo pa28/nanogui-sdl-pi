@@ -41,9 +41,6 @@ public:
                 ListImages sun_images = loadImageDirectory(SDL_GetRenderer(&graphicsContext.GetWindow()), "images", 0);
                 ListImages map_images = loadImageDirectory(SDL_GetRenderer(&graphicsContext.GetWindow()), "maps", 0);
 
-                auto map_day = loadImage(SDL_GetRenderer(&graphicsContext.GetWindow()),"maps/day_earth.png");
-                auto map_night = loadImage(SDL_GetRenderer(&graphicsContext.GetWindow()), "maps/night_earth.png");
-
                 nwindow.wdg<ImageDisplay>(sun_images)
                         .setCallback([](ImageDisplay &w, ImageDisplay::EventType e) {
                             switch(e) {

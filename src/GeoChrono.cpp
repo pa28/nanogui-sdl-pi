@@ -119,7 +119,10 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
                 std::cout << "Rendering trans " << x << std::endl;
                 for (int y = 0; y < tran_day_map->h; y+=1) {
                     auto lonE = (double)(x - tran_day_map->w/2) * M_PI / (double)(tran_day_map->w/2)
-                            + deg2rad(mCentreLongitude);
+                                #if USER_SET_CENTRE_LONG
+                            + deg2rad(mCentreLongitude)
+                                #endif
+                                    ;
                     auto latE = (double)(tran_day_map->h/2 - y) * M_PI_2 / (double)(tran_day_map->h/2);
                     auto cosDeltaSigma = sin(latS)*sin(latE) + cos(latS)*cos(latE)*cos(abs(lonS-lonE));
                     uint32_t alpha = 255;
@@ -164,6 +167,8 @@ void sdlgui::GeoChrono::generateMapSurfaces(SDL_Renderer *renderer) {
     mDayMap = SDL_CreateRGBSurface(0, EARTH_BIG_W, EARTH_BIG_H, 32, rmask, gmask, bmask, amask);
     mNightMap = SDL_CreateRGBSurface(0, EARTH_BIG_W, EARTH_BIG_H, 32, rmask, gmask, bmask, amask);
 
+#if USE_COMPILED_MAPS
+
     auto offx = computOffset();
 
     for (int x = 0; x < EARTH_BIG_W; ++x) {
@@ -182,13 +187,24 @@ void sdlgui::GeoChrono::generateMapSurfaces(SDL_Renderer *renderer) {
             }
         }
 
-        mBackground.tex = SDL_CreateTextureFromSurface(renderer, mNightMap);
-        mBackground.w = EARTH_BIG_W;
-        mBackground.h = EARTH_BIG_H;
-        mBackground.path = "*auto_gen*";
-
-        mMapsDirty = false;
     }
+#else
+    auto dayPNG = IMG_Load("maps/day_earth.png");
+    auto nightPNG = IMG_Load( "maps/night_earth.png");
+
+    SDL_BlitSurface(dayPNG, nullptr, mDayMap, nullptr);
+    SDL_BlitSurface(nightPNG, nullptr, mNightMap, nullptr);
+
+    SDL_FreeSurface(dayPNG);
+    SDL_FreeSurface(nightPNG);
+#endif
+
+    mBackground.tex = SDL_CreateTextureFromSurface(renderer, mNightMap);
+    mBackground.w = EARTH_BIG_W;
+    mBackground.h = EARTH_BIG_H;
+    mBackground.path = "*auto_gen*";
+
+    mMapsDirty = false;
 }
 
 Uint32 sdlgui::GeoChrono::timerCallback(Uint32 interval) {
