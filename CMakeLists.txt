@@ -209,5 +209,5 @@ add_executable(hamchrono ${NNGUI_EXTRA_SOURCE} ${NNGUI_BASIC_SOURCE} ${HAM_SOURC
 set_target_properties(
         hamchrono PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/build/debug")
-target_link_libraries(hamchrono ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
+target_link_libraries(hamchrono m ${NNGUI_EXTRA_LIBS} ${SDL2_LIBRARY} ${SDL2IMAGE_LIBRARY} ${SDL2TTF_LIBRARY})
 
