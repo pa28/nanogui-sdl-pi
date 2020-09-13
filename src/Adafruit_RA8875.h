@@ -54,7 +54,7 @@ static constexpr auto  RGB565_B(uint16_t c) {return  (((c) & 0x001FU) << 3U); }
 
 
     static auto get_RGB_separate( std::size_t x, std::size_t y, Map map) {
-        auto c = map == DAY_MAP ? DEARTH_BIG[x][y] : NEARTH_BIG[x][y];
+        auto c = map == DAY_MAP ? DEARTH_BIG[y][x] : NEARTH_BIG[y][x];
         return std::make_tuple( RGB565_R(c), RGB565_G(c), RGB565_B(c));
     }
 
