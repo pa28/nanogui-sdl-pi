@@ -134,6 +134,7 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
             mForeground.h = tran_day_map->h;
             mForeground.w = tran_day_map->w;
             mForeground.path = "*autogen*";
+            SDL_FreeSurface(tran_day_map);
             mTextureDirty = false;
         }
 
@@ -222,7 +223,6 @@ void sdlgui::GeoChrono::generateMapSurfaces(SDL_Renderer *renderer) {
 }
 
 Uint32 sdlgui::GeoChrono::timerCallback(Uint32 interval) {
-    std::cout << __PRETTY_FUNCTION__ << '\n';
     mMapsDirty = true;
     mTextureDirty = true;
     return interval;
