@@ -214,6 +214,9 @@ void sdlgui::GeoChrono::generateMapSurfaces(SDL_Renderer *renderer) {
     SDL_FreeSurface(nightPNG);
 #endif
 
+    if (mBackground.tex)
+        SDL_DestroyTexture(mBackground.tex);
+
     mBackground.tex = SDL_CreateTextureFromSurface(renderer, mNightMap);
     mBackground.w = EARTH_BIG_W;
     mBackground.h = EARTH_BIG_H;
