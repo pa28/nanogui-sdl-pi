@@ -93,19 +93,6 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
             iy = 0;
         }
 
-        SDL_Rect imgPaintRect{p.x + (int) ix, p.y + (int) iy, (int) iw, (int) ih};
-        SDL_Rect imgSrcRect{0, 0, imgw, imgh};
-        PntRect imgrect = clip_rects(srect2pntrect(imgPaintRect), clip);
-        imgPaintRect.w = imgrect.x2 - imgrect.x1;
-        imgPaintRect.h = imgrect.y2 - imgrect.y1;
-        if (imgPaintRect.y < clip.y1) {
-            imgPaintRect.y = clip.y1;
-            imgSrcRect.h = (int) (((float) imgPaintRect.h / (float) ih) * (float) imgh);
-            imgSrcRect.y = (int) ((1 - ((float) imgPaintRect.h / (float) ih)) * (float) imgh);
-        } else if (imgPaintRect.h < (int) ih) {
-            imgSrcRect.h = (int) (((float) imgPaintRect.h / ih) * (float) imgh);
-        }
-
         if (mTextureDirty) {
             SDL_SetSurfaceBlendMode(mDayMap,
                                     SDL_BLENDMODE_BLEND);
@@ -116,12 +103,11 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
             auto [latS, lonS] = subSolar();
             auto *pixels = (Uint32 *) tran_day_map->pixels;
             for (int x = 0; x < tran_day_map->w; x+=1) {
-                std::cout << "Rendering trans " << x << std::endl;
                 for (int y = 0; y < tran_day_map->h; y+=1) {
                     auto lonE = (double)(x - tran_day_map->w/2) * M_PI / (double)(tran_day_map->w/2)
-                                #if USER_SET_CENTRE_LONG
-                            + deg2rad(mCentreLongitude)
-                                #endif
+//                                #if USER_SET_CENTRE_LONG
+//                            + deg2rad(mCentreLongitude)
+//                                #endif
                                     ;
                     auto latE = (double)(tran_day_map->h/2 - y) * M_PI_2 / (double)(tran_day_map->h/2);
                     auto cosDeltaSigma = sin(latS)*sin(latE) + cos(latS)*cos(latE)*cos(abs(lonS-lonE));
@@ -151,13 +137,42 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
             mTextureDirty = false;
         }
 
+//        SDL_Rect imgPaintRect{p.x + (int) ix, p.y + (int) iy, (int) iw, (int) ih};
+//        SDL_Rect imgSrcRect{0, 0, imgw, imgh};
+//        PntRect imgrect = clip_rects(srect2pntrect(imgPaintRect), clip);
+//        imgPaintRect.w = imgrect.x2 - imgrect.x1;
+//        imgPaintRect.h = imgrect.y2 - imgrect.y1;
+//        if (imgPaintRect.y < clip.y1) {
+//            imgPaintRect.y = clip.y1;
+//            imgSrcRect.h = (int) (((float) imgPaintRect.h / (float) ih) * (float) imgh);
+//            imgSrcRect.y = (int) ((1 - ((float) imgPaintRect.h / (float) ih)) * (float) imgh);
+//        } else if (imgPaintRect.h < (int) ih) {
+//            imgSrcRect.h = (int) (((float) imgPaintRect.h / ih) * (float) imgh);
+//        }
+
+        auto offset = computOffset();
+
         SDL_BlendMode mode;
         SDL_GetTextureBlendMode(mForeground.tex, &mode);
         SDL_SetTextureBlendMode(mForeground.tex, SDL_BLENDMODE_BLEND);
         SDL_SetTextureBlendMode(mBackground.tex, SDL_BLENDMODE_BLEND);
 
-        SDL_RenderCopy(renderer, mBackground.tex, &imgSrcRect, &imgPaintRect);
-        SDL_RenderCopy(renderer, mForeground.tex, &imgSrcRect, &imgPaintRect);
+        if (offset == 0) {
+            SDL_Rect src{0, 0, mForeground.w, mForeground.h};
+            SDL_Rect dst{p.x + (int) ix, p.y + (int) iy, mForeground.w, mForeground.h};
+            SDL_RenderCopy(renderer, mBackground.tex, &src, &dst);
+            SDL_RenderCopy(renderer, mForeground.tex, &src, &dst);
+        } else {
+            SDL_Rect src0{mForeground.w - (int)offset, 0, (int)offset, imgh};
+            SDL_Rect dst0{p.x + (int) ix, p.y + (int) iy, (int)offset, imgh};
+            SDL_RenderCopy(renderer, mBackground.tex, &src0, &dst0);
+            SDL_RenderCopy(renderer, mForeground.tex, &src0, &dst0);
+
+            SDL_Rect src1{ 0, 0, mForeground.w - (int)offset, imgh};
+            SDL_Rect dst1{ p.x + (int) ix + (int)offset, p.y + (int) iy, mForeground.w - (int)offset, imgh};
+            SDL_RenderCopy(renderer, mBackground.tex, &src1, &dst1);
+            SDL_RenderCopy(renderer, mForeground.tex, &src1, &dst1);
+        }
     }
 
     Widget::draw(renderer);
@@ -172,7 +187,6 @@ void sdlgui::GeoChrono::generateMapSurfaces(SDL_Renderer *renderer) {
     auto offx = computOffset();
 
     for (int x = 0; x < EARTH_BIG_W; ++x) {
-        std::cout << "Rendering maps " << x << std::endl;
         for (int y = 0; y < EARTH_BIG_H; ++y) {
             auto xMap = (x + offx) % EARTH_BIG_W;
             {

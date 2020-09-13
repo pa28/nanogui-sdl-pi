@@ -14,8 +14,8 @@
 #include <chrono>
 
 
-static constexpr int USE_COMPILED_MAPS = 0;
-static constexpr int USER_SET_CENTRE_LONG = 0;
+#define USE_COMPILED_MAPS 0
+#define USER_SET_CENTRE_LONG 1
 
 namespace sdlgui {
 
