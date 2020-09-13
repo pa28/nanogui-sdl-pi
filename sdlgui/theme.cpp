@@ -34,6 +34,9 @@ NAMESPACE_BEGIN(sdlgui)
         mTimeBoxHoursMinFontSize = 30;
         mTimeBoxSecFontSize = 20;
         mTimeBoxDateFontSize = 20;
+        mTimeBoxSmallHoursMinFontSize = 30;
+        mTimeBoxSmallSecFontSize = 20;
+        mTimeBoxSmallDateFontSize = 20;
         mWindowCornerRadius = 2;
         mWindowHeaderHeight = 30;
         mWindowDropShadowSize = 10;
@@ -88,10 +91,16 @@ NAMESPACE_BEGIN(sdlgui)
         mFontPath = "/usr/share/fonts/truetype/freefont";
         mTimeBoxTimeFont = "FreeMonoBold";
         mTimeBoxDateFont = "FreeSansBold";
+        mTimeBoxSmallTimeFont = "FreeMonoBold";
+        mTimeBoxSmallDateFont = "FreeSansBold";
 
         mTimeBoxHoursMinFmt = "%R";
         mTimeBoxSecFmt = "%S %Z";
         mTimeBoxDateFmt= "%a %b %d, %Y";
+
+        mTimeBoxSmallHoursMinFmt = "%R";
+        mTimeBoxSmallSecFmt = "%Z";
+        mTimeBoxSmallDateFmt= "%a %b %d";
 
         TTF_Init();
     }

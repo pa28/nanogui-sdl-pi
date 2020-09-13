@@ -83,6 +83,10 @@ namespace sdlgui {
         time_point <system_clock> mEpoch;
         duration<double> mElapsedSeconds{};
         bool mIsLocalTime{false};
+        bool mSmallBox{false};
+        bool mConfigured{false};
+        bool mFontSet{false};
+        bool mFontSizeSet{false};
         Widget *mTimeDisplay;
         Widget *mDateDisplay;
         Label *mHoursMins;
@@ -96,6 +100,8 @@ namespace sdlgui {
         std::string mTimeBoxTimeFont;
         std::string mTimeBoxDateFont;
 
+        void configure();
+
     public:
         /**
          * Constructor
@@ -103,8 +109,8 @@ namespace sdlgui {
          * @param font the font to use or an empty string for the default
          * @param fontSize the font size to use or -1 for the default
          */
-        explicit TimeBox(Widget *parent, bool localTime = false,
-                         const std::string &font = "", int fontSize = -1);
+        explicit TimeBox(Widget *parent, bool small = false, bool localTime = false, const string &font = "",
+                         int fontSize = -1);
 
         /**
          * Render time for a specific time.

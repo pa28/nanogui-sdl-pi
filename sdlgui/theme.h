@@ -52,6 +52,9 @@ public:
     int mTimeBoxHoursMinFontSize;
     int mTimeBoxSecFontSize;
     int mTimeBoxDateFontSize;
+    int mTimeBoxSmallHoursMinFontSize;
+    int mTimeBoxSmallSecFontSize;
+    int mTimeBoxSmallDateFontSize;
     int mWindowCornerRadius;
     int mWindowHeaderHeight;
     int mWindowDropShadowSize;
@@ -108,10 +111,16 @@ public:
     std::string mFontPath;
     std::string mTimeBoxTimeFont;
     std::string mTimeBoxDateFont;
+    std::string mTimeBoxSmallTimeFont;
+    std::string mTimeBoxSmallDateFont;
 
     std::string mTimeBoxHoursMinFmt;
     std::string mTimeBoxSecFmt;
     std::string mTimeBoxDateFmt;
+
+    std::string mTimeBoxSmallHoursMinFmt;
+    std::string mTimeBoxSmallSecFmt;
+    std::string mTimeBoxSmallDateFmt;
 
     [[maybe_unused]] void getTexAndRect(SDL_Renderer *renderer, int x, int y, const char *text,
       const char* fontname, size_t ptsize, SDL_Texture **texture, SDL_Rect *rect, SDL_Color *textColor) const;

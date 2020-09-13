@@ -11,15 +11,22 @@
 
 static Uint32 TimeBoxCallbackStub(Uint32 interval, void *param);
 
-sdlgui::TimeBox::TimeBox(sdlgui::Widget *parent, bool localTime, const std::string &font, int fontSize)
+sdlgui::TimeBox::TimeBox(Widget *parent, bool small, bool localTime, const string &font, int fontSize)
         : Widget(parent),
           mTimer(*this, &TimeBox::timerCallback, 1000),
           mIsLocalTime(localTime),
+          mSmallBox(small),
           locale_time_put(use_facet<time_put<char>>(locale())) {
     if (fontSize < 0) {
-        mTimeBoxHoursMinFontSize = mTheme->mTimeBoxHoursMinFontSize;
-        mTimeBoxSecFontSize = mTheme->mTimeBoxSecFontSize;
-        mTimeBoxDateFontSize = mTheme->mTimeBoxDateFontSize;
+        if (mSmallBox) {
+            mTimeBoxHoursMinFontSize = mTheme->mTimeBoxSmallHoursMinFontSize;
+            mTimeBoxSecFontSize = mTheme->mTimeBoxSmallSecFontSize;
+            mTimeBoxDateFontSize = mTheme->mTimeBoxSmallDateFontSize;
+        } else {
+            mTimeBoxHoursMinFontSize = mTheme->mTimeBoxHoursMinFontSize;
+            mTimeBoxSecFontSize = mTheme->mTimeBoxSecFontSize;
+            mTimeBoxDateFontSize = mTheme->mTimeBoxDateFontSize;
+        }
     } else {
         mTimeBoxHoursMinFontSize = fontSize;
         mTimeBoxDateFontSize = fontSize;
@@ -27,8 +34,13 @@ sdlgui::TimeBox::TimeBox(sdlgui::Widget *parent, bool localTime, const std::stri
     }
 
     if (font.empty()) {
-        mTimeBoxDateFont = mTheme->mTimeBoxDateFont;
-        mTimeBoxTimeFont = mTheme->mTimeBoxTimeFont;
+        if (mSmallBox) {
+            mTimeBoxDateFont = mTheme->mTimeBoxSmallDateFont;
+            mTimeBoxTimeFont = mTheme->mTimeBoxSmallTimeFont;
+        } else {
+            mTimeBoxDateFont = mTheme->mTimeBoxDateFont;
+            mTimeBoxTimeFont = mTheme->mTimeBoxTimeFont;
+        }
     } else {
         mTimeBoxDateFont = font;
         mTimeBoxTimeFont = font;
@@ -66,15 +78,18 @@ void sdlgui::TimeBox::renderTime(const std::chrono::time_point<std::chrono::syst
     stringstream hm;
     hm.imbue(locale());
 
-    put_locale_time( hm, ' ', &tm, mTheme->mTimeBoxHoursMinFmt);
+    put_locale_time( hm, ' ', &tm,
+                     mSmallBox ? mTheme->mTimeBoxSmallHoursMinFmt : mTheme->mTimeBoxHoursMinFmt);
     mHoursMins->setCaption(hm.str());
 
     hm.str("");
-    put_locale_time( hm, ' ', &tm, mTheme->mTimeBoxSecFmt);
+    put_locale_time(hm, ' ', &tm,
+                    mSmallBox ? mTheme->mTimeBoxSmallSecFmt : mTheme->mTimeBoxSecFmt);
     mSeconds->setCaption(hm.str());
 
     hm.str("");
-    put_locale_time( hm, ' ', &tm, mTheme->mTimeBoxDateFmt);
+    put_locale_time( hm, ' ', &tm,
+                     mSmallBox ? mTheme->mTimeBoxSmallDateFmt : mTheme->mTimeBoxDateFmt);
     mDate->setCaption(hm.str());
 }
 

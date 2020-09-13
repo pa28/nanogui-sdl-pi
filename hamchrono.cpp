@@ -38,6 +38,8 @@ public:
 
                 nwindow.wdg<TimeBox>().withPosition(Vector2i(0, 55));
 
+                nwindow.wdg<TimeBox>(true, true).withPosition(Vector2i(0, topPanelH));
+
                 ListImages sun_images = loadImageDirectory(SDL_GetRenderer(&graphicsContext.GetWindow()), "images", 0);
                 ListImages map_images = loadImageDirectory(SDL_GetRenderer(&graphicsContext.GetWindow()), "maps", 0);
 
