@@ -130,6 +130,8 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
 //                std::cout << '\n';
             }
 
+            if (mForeground.tex)
+                SDL_DestroyTexture(mForeground.tex);
             mForeground.tex = SDL_CreateTextureFromSurface(renderer, tran_day_map);
             mForeground.h = tran_day_map->h;
             mForeground.w = tran_day_map->w;
@@ -180,6 +182,11 @@ void sdlgui::GeoChrono::draw(SDL_Renderer *renderer) {
 }
 
 void sdlgui::GeoChrono::generateMapSurfaces(SDL_Renderer *renderer) {
+    if (mDayMap)
+        SDL_FreeSurface(mDayMap);
+    if (mNightMap)
+        SDL_FreeSurface(mNightMap);
+
     mDayMap = SDL_CreateRGBSurface(0, EARTH_BIG_W, EARTH_BIG_H, 32, rmask, gmask, bmask, amask);
     mNightMap = SDL_CreateRGBSurface(0, EARTH_BIG_W, EARTH_BIG_H, 32, rmask, gmask, bmask, amask);
 
