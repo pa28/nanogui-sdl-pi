@@ -50,6 +50,8 @@ NAMESPACE_BEGIN(sdlgui)
         mTabButtonVerticalPadding = 2;
         mScrollBarWidth = 20;
         mScrollBarGutter = 2;
+        mMinBrightness = 16;
+        mMaxBrightness = 255;
 
         mDropShadow = Color(32, 32, 32, 255);
         mTransparent = Color(0, 0);

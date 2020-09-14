@@ -10,8 +10,10 @@
 #include <PiApplication.h>
 #include <ImageDisplay.h>
 #include <GeoChrono.h>
+#include <BrighnessControl.h>
 #include <sdlgui/timebox.h>
 #include <sdlgui/nanovg.h>
+#include <sdlgui/slider.h>
 #include "Adafruit_RA8875.h"
 
 using namespace sdlgui;
@@ -21,6 +23,11 @@ private:
     std::vector<SDL_Texture *> mImagesData;
     sdlgui::ListImages mImages;
     int mCurrentImage{0};
+    BrightnessControl mBrightnessControl;
+
+    void setBrightness(float b) {
+        mBrightnessControl.setBrightness(b);
+    }
 
 public:
     explicit HamChrono(PiGraphicsContext &graphicsContext) : PiApplication(graphicsContext) {
@@ -32,7 +39,7 @@ public:
                         .withPosition(graphicsContext.Position())
                         .withFixedSize(graphicsContext.Size());
 
-                nwindow.wdg<Button>("VE3YSH", [] { cout << "QTH Edit\n"; })
+                nwindow.wdg<Button>("VE3YSH", [] { exit(0); })
                         .withPosition(Vector2i(0, 0))
                         .setFontSize(40);
 
@@ -52,17 +59,16 @@ public:
                                     break;
                                 case ImageDisplay::LEFT_EVENT:
                                 case ImageDisplay::UP_EVENT:
-                                    w.setImageIndex(w.getImageIndex()-1);
+                                    w.setImageIndex(w.getImageIndex() - 1);
                                     break;
                             }
                         })
                         .withFixedSize(Vector2i(topPanelH, topPanelH))
                         .withPosition(Vector2i(170, 0));
 
-//                nwindow.wdg<ImageDisplay>(map_images)
-//                        .withImageIndex(1)
-//                        .withFixedSize(Vector2i(EARTH_BIG_W, EARTH_BIG_H))
-//                        .withPosition(Vector2i(FB_XRES - EARTH_BIG_W, FB_YRES - EARTH_BIG_H));
+//                nwindow.wdg<Slider>(1.).setCallback([this](float b){setBrightness(b);})
+//                        .withFixedSize(Vector2i(100, 30))
+//                        .withPosition(Vector2i(10, topPanelH - 35));
 
                 nwindow.wdg<GeoChrono>()
                         .withCentreLongitude(-76.0)

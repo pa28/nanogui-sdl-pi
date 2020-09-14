@@ -68,6 +68,8 @@ public:
     int mTabButtonVerticalPadding;
     int mScrollBarWidth;
     int mScrollBarGutter;
+    int mMinBrightness;
+    int mMaxBrightness;
 
     std::mutex loadMutex;
 
