@@ -161,6 +161,8 @@ NAMESPACE_BEGIN(sdlgui)
             return -1;
 
         TTF_SizeText(font, text, w, h);
+//        TTF_CloseFont(font);
+//        font = nullptr;
         return 0;
     }
 
@@ -171,6 +173,8 @@ NAMESPACE_BEGIN(sdlgui)
             return -1;
 
         TTF_SizeUTF8(font, text, w, h);
+//        TTF_CloseFont(font);
+//        font = nullptr;
         return 0;
     }
 
@@ -188,6 +192,10 @@ NAMESPACE_BEGIN(sdlgui)
 
         int w, h;
         TTF_SizeUTF8(font, text, &w, &h);
+// TODO: Can't close the font, because it might be used (getFont caches fonts), but doesn't
+// cache the SDL_RWop associated, so that leaks.
+//        TTF_CloseFont(font);
+//        font = nullptr;
         return w;
     }
 
