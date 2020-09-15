@@ -6,11 +6,11 @@
 #include <chrono>
 #include <iomanip>
 #include <array>
+#include <fstream>
 #include <string_view>
 #include <PiApplication.h>
 #include <ImageDisplay.h>
 #include <GeoChrono.h>
-#include <BrighnessControl.h>
 #include <sdlgui/timebox.h>
 #include <sdlgui/nanovg.h>
 #include <sdlgui/slider.h>
@@ -23,13 +23,30 @@ private:
     std::vector<SDL_Texture *> mImagesData;
     sdlgui::ListImages mImages;
     int mCurrentImage{0};
-    BrightnessControl mBrightnessControl;
+    bool mHasBrightnessControl{true};
 
-    void setBrightness(float b) {
-        mBrightnessControl.setBrightness(b);
-    }
+    static constexpr std::string_view brightnessDevice = "/sys/class/backlight/rpi_backlight/brightness";
 
 public:
+    void setBrightness(float brightness) {
+        if (mHasBrightnessControl) {
+            auto min = mTheme->mMinBrightness;
+            auto max = mTheme->mMaxBrightness;
+            auto bright = (float) (max - min) * brightness + (float) min;
+
+            std::ofstream ofs;
+            ofs.open(std::string(brightnessDevice), std::ofstream::out);
+            if (ofs) {
+                ofs << (int) bright << '\n';
+                ofs.close();
+            } else {
+                // TODO: Better error reporting.
+                mHasBrightnessControl = false;
+                std::cerr << "Can not open " << brightnessDevice << std::endl;
+            }
+        }
+    }
+
     explicit HamChrono(PiGraphicsContext &graphicsContext) : PiApplication(graphicsContext) {
         {
             {
@@ -66,9 +83,12 @@ public:
                         .withFixedSize(Vector2i(topPanelH, topPanelH))
                         .withPosition(Vector2i(170, 0));
 
-//                nwindow.wdg<Slider>(1.).setCallback([this](float b){setBrightness(b);})
-//                        .withFixedSize(Vector2i(100, 30))
-//                        .withPosition(Vector2i(10, topPanelH - 35));
+                nwindow.wdg<Slider>(1.0,
+                                    [&](Slider *obj, float value) {
+                                        this->setBrightness(value);
+                                    })
+                        .withFixedSize(Vector2i(140, 30))
+                        .withPosition(Vector2i(10, topPanelH - 35));
 
                 nwindow.wdg<GeoChrono>()
                         .withCentreLongitude(-76.0)
